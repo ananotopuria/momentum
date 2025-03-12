@@ -8,6 +8,7 @@ export default {
         black: "#000",
         blueViolet: "#8338EC",
         grey: "#212529",
+        gainsboro: "#DEE2E6",
       },
       fontFamily: {
         firago: ["FiraGo", "sans-serif"],

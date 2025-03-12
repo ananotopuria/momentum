@@ -29,5 +29,6 @@ html {
 }
 
 body {
+  font-family: "FiraGo", sans-serif;
   overflow-x: hidden;
 }
