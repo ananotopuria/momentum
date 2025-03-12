@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Title from "../CommonComponents/Title";
 import Filters from "./Filter";
+import StatusBoard from "./StatusBoard";
 
 function HomePageComponents() {
   const [filters, setFilters] = useState<{
@@ -19,6 +20,7 @@ function HomePageComponents() {
       <section className="px-[12rem]">
         <Filters filters={filters} setFilters={setFilters} />
       </section>
+      <StatusBoard />
     </>
   );
 }
