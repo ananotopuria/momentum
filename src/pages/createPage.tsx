@@ -1,5 +1,11 @@
-function CreatePAge(){
-    return <h1>create page</h1>
+import CreatePageComponents from "../components/CreatePageComponents";
+
+function CreatePAge() {
+  return (
+    <>
+      <CreatePageComponents />
+    </>
+  );
 }
 
 export default CreatePAge;

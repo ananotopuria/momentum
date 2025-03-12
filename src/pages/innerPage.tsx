@@ -1,5 +1,9 @@
+import InnerPageComponents from "../components/InnerPageComponents";
+
 function InnerPage(){
-    return <h1>inner page</h1>
+    return <>
+        <InnerPageComponents/>
+    </>
 }
 
 export default InnerPage;
