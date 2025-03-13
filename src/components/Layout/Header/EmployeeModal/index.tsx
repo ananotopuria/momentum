@@ -4,23 +4,21 @@ import { createPortal } from "react-dom";
 import axios from "axios";
 import { IoIosCloseCircle } from "react-icons/io";
 import Button from "../../../CommonComponents/Button";
+import ImageUpload from "./../imageUpload";
+import { EmployeeForm } from "../types";
 
 interface Department {
   id: number;
   name: string;
 }
 
-interface EmployeeForm {
-  name: string;
-  surname: string;
-  avatar: FileList;
-  department_id: string;
-}
-
-const EmployeeModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
+function EmployeeModal({
   isOpen,
   onClose,
-}) => {
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const {
     register,
     handleSubmit,
@@ -31,7 +29,6 @@ const EmployeeModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   } = useForm<EmployeeForm>({ mode: "onChange" });
 
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -50,12 +47,13 @@ const EmployeeModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   }, [isOpen, reset]);
 
   const validateName = (value: string) => /^[a-zA-Zა-ჰ]+$/i.test(value);
+  const nameValue = watch("name", "");
+  const surnameValue = watch("surname", "");
 
-  const validateAvatar = (file?: FileList) => {
-    if (!file || file.length === 0) return "Avatar is required";
-    if (file[0].size > 600 * 1024) return "File size must be under 600KB";
-    if (!file[0].type.startsWith("image/")) return "File must be an image";
-    return true;
+  const getInputBorderColor = (value: string, error?: FieldError) => {
+    if (value.length === 0) return "border-black";
+    if (error) return "border-red-500";
+    return "border-green-500";
   };
 
   const handleOutsideClick = useCallback(
@@ -80,10 +78,15 @@ const EmployeeModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   }, [isOpen, handleOutsideClick]);
 
   const onSubmit = (data: EmployeeForm) => {
+    if (!data.avatar) {
+      console.error("Avatar is required");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("surname", data.surname);
-    formData.append("avatar", data.avatar[0]);
+    formData.append("avatar", data.avatar);
     formData.append("department_id", data.department_id);
 
     axios
@@ -95,24 +98,12 @@ const EmployeeModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
       .catch((error) => console.error("Error creating employee:", error));
   };
 
-  const nameValue = watch("name", "");
-  const surnameValue = watch("surname", "");
-
-  const getInputBorderColor = (
-    value: string,
-    error: FieldError | undefined
-  ) => {
-    if (value.length === 0) return "border-black";
-    if (error) return "border-red-500";
-    return "border-green-500";
-  };
-
   return isOpen
     ? createPortal(
         <div className="fixed inset-0 flex items-center justify-center bg-[#0D0F1026] backdrop-blur-sm p-4 z-50 w-full h-full mx-auto my-auto">
           <div
             ref={dialogRef}
-            className="bg-white rounded-lg px-[5rem] py-[10rem] w-[90rem] h-[70rem] relative"
+            className="bg-white rounded-lg px-[5rem] py-[10rem] w-[90rem] h-[76rem] relative"
           >
             <button
               onClick={onClose}
@@ -126,7 +117,9 @@ const EmployeeModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
             <form onSubmit={handleSubmit(onSubmit)} className="mt-[4rem]">
               <div className="flex justify-between items-center">
                 <div className="w-[38rem]">
-                  <label className="block text-[1.4rem]">სახელი*</label>
+                  <label className="block text-[1.4rem] text-grey">
+                    სახელი*
+                  </label>
                   <input
                     {...register("name", {
                       required: "მინიმუმ 2 სიმბოლო",
@@ -142,31 +135,32 @@ const EmployeeModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                   <p
                     className={`text-[1.2rem] mt-1 ${
                       errors.name
-                        ? "text-red-500"
+                        ? "#FA4D4D"
                         : nameValue.length >= 2
-                        ? "text-green-500"
-                        : "text-black"
+                        ? "#08A508"
+                        : "text-[#6C757D]"
                     }`}
                   >
-                    მინიმუმ 2 სიმბოლო
+                    &#x2713; მინიმუმ 2 სიმბოლო
                   </p>
                   <p
                     className={`text-[1.2rem] ${
                       errors.name
-                        ? "text-red-500"
+                        ? "#FA4D4D"
                         : nameValue.length > 255
-                        ? "text-red-500"
+                        ? "#FA4D4D"
                         : nameValue.length >= 2
-                        ? "text-green-500"
-                        : "text-black"
+                        ? "#08A508"
+                        : "text-[#6C757D]"
                     }`}
                   >
-                    მინიმუმ 255 სიმბოლო
+                    &#x2713; მინიმუმ 255 სიმბოლო
                   </p>
                 </div>
-
                 <div className="w-[38rem]">
-                  <label className="block text-[1.4rem]">გვარი*</label>
+                  <label className="block text-[1.4rem] text-grey">
+                    გვარი*
+                  </label>
                   <input
                     {...register("surname", {
                       required: "მინიმუმ 2 სიმბოლო",
@@ -182,65 +176,45 @@ const EmployeeModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                   <p
                     className={`text-[1.2rem] mt-1 ${
                       errors.surname
-                        ? "text-red-500"
+                        ? "#FA4D4D"
                         : surnameValue.length >= 2
-                        ? "text-green-500"
-                        : "text-black"
+                        ? "#08A508"
+                        : "text-[#6C757D]"
                     }`}
                   >
-                    მინიმუმ 2 სიმბოლო
+                    &#x2713; მინიმუმ 2 სიმბოლო
                   </p>
                   <p
                     className={`text-[1.2rem] ${
                       errors.surname
-                        ? "text-red-500"
+                        ? "#FA4D4D"
                         : surnameValue.length > 255
-                        ? "text-red-500"
+                        ? "#FA4D4D"
                         : surnameValue.length >= 2
-                        ? "text-green-500"
-                        : "text-black"
+                        ? "#08A508"
+                        : "text-[#6C757D]"
                     }`}
                   >
-                    მინიმუმ 255 სიმბოლო
+                    &#x2713; მინიმუმ 255 სიმბოლო
                   </p>
                 </div>
               </div>
-
-              <label className="block mt-2">ავატარი*</label>
-              <input
-                type="file"
-                {...register("avatar", { validate: validateAvatar })}
-                onChange={(e) => {
-                  setValue("avatar", e.target.files as FileList);
-                  setAvatarPreview(
-                    e.target.files?.[0]
-                      ? URL.createObjectURL(e.target.files[0])
-                      : null
-                  );
-                }}
-                className="w-full border p-2"
-              />
-              {avatarPreview && (
-                <img
-                  src={avatarPreview}
-                  alt="Avatar Preview"
-                  className="mt-2 w-20 h-20 object-cover rounded-full"
-                />
-              )}
-
-              <label className="block mt-2">დეპარტამენტი*</label>
+              <ImageUpload setValue={setValue} error={errors.avatar?.message} />
+              <label className="block mt-[4.5rem] text-grey text-[1.4rem] font-[500]">
+                დეპარტამენტი*
+              </label>
               <select
                 {...register("department_id", { required: "Required" })}
-                className="w-full border p-2"
+                className="w-[38rem] border p-2 rounded-lg py-[1.4rem] px-[1rem]"
               >
-                <option value="">Select Department</option>
+                <option value=""></option>
                 {departments.map((dept) => (
                   <option key={dept.id} value={dept.id}>
                     {dept.name}
                   </option>
                 ))}
               </select>
-              <div className="flex justify-end gap-[2rem] mt-4">
+              <div className="flex justify-end gap-[2rem] mt-[4.5rem]">
                 <Button
                   title="გაუქმება"
                   bgColor="bg-white"
@@ -262,6 +236,6 @@ const EmployeeModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
         document.getElementById("modal-root")!
       )
     : null;
-};
+}
 
 export default EmployeeModal;
