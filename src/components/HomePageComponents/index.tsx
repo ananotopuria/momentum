@@ -3,7 +3,9 @@ import Title from "../CommonComponents/Title";
 import Filters from "./Filter";
 import StatusBoard from "./StatusBoard";
 
+
 function HomePageComponents() {
+  
   const [filters, setFilters] = useState<{
     departments: string[];
     priorities: string[];
@@ -15,13 +17,14 @@ function HomePageComponents() {
   });
 
   return (
-    <>
+    <main>
       <Title text="დავალების გვერდი" />
       <section className="px-[12rem]">
         <Filters filters={filters} setFilters={setFilters} />
       </section>
       <StatusBoard />
-    </>
+      
+    </main>
   );
 }
 

@@ -27,7 +27,7 @@ function StatusBoard() {
   }, []);
 
   return (
-    <div className="flex justify-between p-[12rem]">
+    <section className="flex justify-between p-[12rem]">
       {statuses.map((status, index) => (
         <div
           key={status.id}
@@ -37,7 +37,7 @@ function StatusBoard() {
           <h2 className="text-[1.8rem] font-[500]">{status.name}</h2>
         </div>
       ))}
-    </div>
+    </section>
   );
 }
 

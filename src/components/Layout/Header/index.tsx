@@ -1,7 +1,12 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import Button from "../../CommonComponents/Button";
 import Logo from "./../../../assets/Frame1000006027.png";
+import EmployeeModal from "./EmployeeModal";
+
 function Header() {
+  const [isModalOpen, setModalOpen] = useState(false);
+
   return (
     <header className="flex items-center justify-between h-[10rem] px-[12rem] font-firago">
       <Link to="/">
@@ -13,6 +18,7 @@ function Header() {
           bgColor="bg-white"
           textColor="text-blueViolet"
           borderColor="border-blueViolet"
+          onClick={() => setModalOpen(true)}
         />
         <Button
           title="+ შექმენი ახალი დავალება"
@@ -22,7 +28,9 @@ function Header() {
           link="/create"
         />
       </div>
+      <EmployeeModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
     </header>
   );
 }
+
 export default Header;

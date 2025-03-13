@@ -1,9 +1,10 @@
 import Title from "../CommonComponents/Title";
 
 function CreatePageComponents() {
-  return <>
+  return <main>
     <Title text="შექმენი ახალი დავალება" />
-  </>
+    
+  </main>
 }
 
 export default CreatePageComponents;
