@@ -9,6 +9,9 @@ export default {
         blueViolet: "#8338EC",
         grey: "#212529",
         gainsboro: "#DEE2E6",
+        red: "#FA4D4D",
+        green: "#08A508",
+        lightGrey: "#6C757D"
       },
       fontFamily: {
         firago: ["FiraGo", "sans-serif"],
