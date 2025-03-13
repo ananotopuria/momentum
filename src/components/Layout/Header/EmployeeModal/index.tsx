@@ -90,14 +90,18 @@ function EmployeeModal({
     formData.append("department_id", data.department_id);
 
     axios
-      .post("https://momentum.redberryinternship.ge/api/employees", formData)
+      .post("https://momentum.redberryinternship.ge/api/employees", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+        },
+      })
       .then(() => {
         reset();
         onClose();
       })
       .catch((error) => console.error("Error creating employee:", error));
   };
-
   return isOpen
     ? createPortal(
         <div className="fixed inset-0 flex items-center justify-center bg-[#0D0F1026] backdrop-blur-sm p-4 z-50 w-full h-full mx-auto my-auto">
