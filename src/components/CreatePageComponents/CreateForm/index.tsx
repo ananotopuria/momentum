@@ -3,6 +3,7 @@ import Button from "../../CommonComponents/Button";
 import { useDepartments } from "./../../../hooks/useDepartments";
 import { useEmployees } from "../../../hooks/useEmployees";
 import { useStatuses } from "../../../hooks/useStatuses";
+import { usePriorities } from "../../../hooks/usePriorities";
 
 interface FormData {
   title: string;
@@ -10,6 +11,7 @@ interface FormData {
   department_id: string;
   responsible_employee_id: string;
   status_id: string;
+  priority_id: string;
 }
 
 function CreateForm() {
@@ -35,6 +37,11 @@ function CreateForm() {
     isLoading: isLoadingStatuses,
     isError: isErrorStatuses,
   } = useStatuses();
+  const {
+    data: priorities = [],
+    isLoading: isLoadingPriorities,
+    isError: isErrorPriorities,
+  } = usePriorities();
 
   const titleValue = watch("title", "");
   const descriptionValue = watch("description", "") || "";
@@ -231,6 +238,30 @@ function CreateForm() {
           </div>
         </div>
         <div>
+          <div className="w-[55rem] mt-[5.5rem]">
+            <label className="block text-[1.4rem] text-grey font-[400]">
+              პრიორიტეტი*
+            </label>
+            {isLoadingPriorities ? (
+              <p>Loading...</p>
+            ) : isErrorPriorities ? (
+              <p className="text-red">Failed to load</p>
+            ) : (
+              <select
+                {...register("priority_id", {
+                  required: "პრიორიტეტი სავალდებულოა",
+                })}
+                className="w-full border p-2 rounded-lg"
+              >
+                <option value="">აირჩიეთ პრიორიტეტი</option>
+                {priorities.map((priority) => (
+                  <option key={priority.id} value={priority.id}>
+                    {priority.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
           <div className="w-[55rem] mt-[5.5rem]">
             <label className="block text-[1.4rem] text-grey font-[400]">
               სტატუსი*
