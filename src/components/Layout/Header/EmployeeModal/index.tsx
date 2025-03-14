@@ -1,16 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useForm, FieldError } from "react-hook-form";
 import { createPortal } from "react-dom";
-import axios from "axios";
 import { IoIosCloseCircle } from "react-icons/io";
 import Button from "../../../CommonComponents/Button";
 import ImageUpload from "./../imageUpload";
 import { EmployeeForm } from "../types";
-
-interface Department {
-  id: number;
-  name: string;
-}
+import { useDepartments } from "./../../../../hooks/useDepartments";
+import axios from "axios";
 
 function EmployeeModal({
   isOpen,
@@ -28,19 +24,8 @@ function EmployeeModal({
     formState: { errors },
   } = useForm<EmployeeForm>({ mode: "onChange" });
 
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const { data: departments = [], isLoading, isError } = useDepartments();
   const dialogRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      axios
-        .get<Department[]>(
-          "https://momentum.redberryinternship.ge/api/departments"
-        )
-        .then((response) => setDepartments(response.data))
-        .catch((error) => console.error("Error fetching departments:", error));
-    }
-  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) reset();
@@ -51,9 +36,9 @@ function EmployeeModal({
   const surnameValue = watch("surname", "");
 
   const getInputBorderColor = (value: string, error?: FieldError) => {
-    if (value.length === 0) return "border-black";
-    if (error) return "border-red-500";
-    return "border-green-500";
+    if (value.length === 0) return "border-gray-400";
+    if (error) return "border-red";
+    return "border-green";
   };
 
   const handleOutsideClick = useCallback(
@@ -102,6 +87,7 @@ function EmployeeModal({
       })
       .catch((error) => console.error("Error creating employee:", error));
   };
+
   return isOpen
     ? createPortal(
         <div className="fixed inset-0 flex items-center justify-center bg-[#0D0F1026] backdrop-blur-sm p-4 z-50 w-full h-full mx-auto my-auto">
@@ -115,20 +101,23 @@ function EmployeeModal({
             >
               <IoIosCloseCircle className="w-[4rem] h-[4rem] text-[#DEE2E6]" />
             </button>
-            <h2 className="text-[3.2rem] font-[500] text-center text-grey">
+            <h2 className="text-[3.2rem] font-[500] text-center text-gray-700">
               თანამშრომლის დამატება
             </h2>
             <form onSubmit={handleSubmit(onSubmit)} className="mt-[4rem]">
               <div className="flex justify-between items-center">
                 <div className="w-[38rem]">
-                  <label className="block text-[1.4rem] text-grey">
+                  <label className="block text-[1.4rem] text-gray-700">
                     სახელი*
                   </label>
                   <input
                     {...register("name", {
                       required: "მინიმუმ 2 სიმბოლო",
                       minLength: { value: 2, message: "მინიმუმ 2 სიმბოლო" },
-                      maxLength: { value: 255, message: "მინიმუმ 255 სიმბოლო" },
+                      maxLength: {
+                        value: 255,
+                        message: "მინიმუმ 255 სიმბოლო",
+                      },
                       validate: validateName,
                     })}
                     className={`w-full border p-2 rounded-lg py-[1.4rem] px-[1rem] ${getInputBorderColor(
@@ -139,10 +128,10 @@ function EmployeeModal({
                   <p
                     className={`text-[1.2rem] mt-1 ${
                       errors.name
-                        ? "#FA4D4D"
+                        ? "text-red"
                         : nameValue.length >= 2
-                        ? "#08A508"
-                        : "text-[#6C757D]"
+                        ? "text-green"
+                        : "text-gray-500"
                     }`}
                   >
                     &#x2713; მინიმუმ 2 სიმბოლო
@@ -150,11 +139,11 @@ function EmployeeModal({
                   <p
                     className={`text-[1.2rem] ${
                       errors.name
-                        ? "#FA4D4D"
+                        ? "text-red"
                         : nameValue.length > 255
-                        ? "#FA4D4D"
+                        ? "text-red"
                         : nameValue.length >= 2
-                        ? "#08A508"
+                        ? "text-green"
                         : "text-[#6C757D]"
                     }`}
                   >
@@ -162,14 +151,17 @@ function EmployeeModal({
                   </p>
                 </div>
                 <div className="w-[38rem]">
-                  <label className="block text-[1.4rem] text-grey">
+                  <label className="block text-[1.4rem] text-gray-700">
                     გვარი*
                   </label>
                   <input
                     {...register("surname", {
                       required: "მინიმუმ 2 სიმბოლო",
                       minLength: { value: 2, message: "მინიმუმ 2 სიმბოლო" },
-                      maxLength: { value: 255, message: "მინიმუმ 255 სიმბოლო" },
+                      maxLength: {
+                        value: 255,
+                        message: "მინიმუმ 255 სიმბოლო",
+                      },
                       validate: validateName,
                     })}
                     className={`w-full border p-2 rounded-lg py-[1.4rem] px-[1rem] ${getInputBorderColor(
@@ -180,22 +172,22 @@ function EmployeeModal({
                   <p
                     className={`text-[1.2rem] mt-1 ${
                       errors.surname
-                        ? "#FA4D4D"
+                        ? "text-red"
                         : surnameValue.length >= 2
-                        ? "#08A508"
-                        : "text-[#6C757D]"
+                        ? "text-green"
+                        : "text-gray-500"
                     }`}
                   >
                     &#x2713; მინიმუმ 2 სიმბოლო
                   </p>
                   <p
                     className={`text-[1.2rem] ${
-                      errors.surname
-                        ? "#FA4D4D"
-                        : surnameValue.length > 255
-                        ? "#FA4D4D"
-                        : surnameValue.length >= 2
-                        ? "#08A508"
+                      errors.name
+                        ? "text-red"
+                        : nameValue.length > 255
+                        ? "text-red"
+                        : nameValue.length >= 2
+                        ? "text-green"
                         : "text-[#6C757D]"
                     }`}
                   >
@@ -203,21 +195,30 @@ function EmployeeModal({
                   </p>
                 </div>
               </div>
+
               <ImageUpload setValue={setValue} error={errors.avatar?.message} />
-              <label className="block mt-[4.5rem] text-grey text-[1.4rem] font-[500]">
+
+              <label className="block mt-[4.5rem] text-gray-700 text-[1.4rem] font-[500]">
                 დეპარტამენტი*
               </label>
-              <select
-                {...register("department_id", { required: "Required" })}
-                className="w-[38rem] border p-2 rounded-lg py-[1.4rem] px-[1rem]"
-              >
-                <option value=""></option>
-                {departments.map((dept) => (
-                  <option key={dept.id} value={dept.id}>
-                    {dept.name}
-                  </option>
-                ))}
-              </select>
+              {isLoading ? (
+                <p className="text-gray-500">Loading departments...</p>
+              ) : isError ? (
+                <p className="text-red">Failed to load departments</p>
+              ) : (
+                <select
+                  {...register("department_id", { required: "Required" })}
+                  className="w-[38rem] border p-2 rounded-lg py-[1.4rem] px-[1rem]"
+                >
+                  <option value="">აირჩიეთ დეპარტამენტი</option>
+                  {departments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+
               <div className="flex justify-end gap-[2rem] mt-[4.5rem]">
                 <Button
                   title="გაუქმება"

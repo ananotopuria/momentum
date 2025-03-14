@@ -1,9 +1,11 @@
 import { useForm, FieldError, SubmitHandler } from "react-hook-form";
 import Button from "../../CommonComponents/Button";
+import { useDepartments } from "./../../../hooks/useDepartments";
 
 interface FormData {
   title: string;
   description?: string;
+  department_id: string; 
 }
 
 function CreateForm() {
@@ -14,8 +16,11 @@ function CreateForm() {
     formState: { errors },
   } = useForm<FormData>({ mode: "onChange" });
 
+  const { data: departments = [], isLoading, isError } = useDepartments(); 
+
   const titleValue = watch("title", "");
   const descriptionValue = watch("description", "") || "";
+  const departmentValue = watch("department_id", "");
 
   const getInputBorderColor = (
     value: string,
@@ -123,6 +128,45 @@ function CreateForm() {
             &#x2713; მაქსიმუმ 255 სიმბოლო
           </p>
         </div>
+        <div className="w-[55rem] mt-[5.5rem]">
+          <label className="block text-[1.4rem] text-grey font-[400]">
+            დეპარტამენტი*
+          </label>
+          {isLoading ? (
+            <p>Loading departments...</p>
+          ) : isError ? (
+            <p className="text-red">Failed to load departments</p>
+          ) : (
+            <select
+              {...register("department_id", {
+                required: "დეპარტამენტი სავალდებულოა",
+              })}
+              className={`w-full border p-2 rounded-lg ${getInputBorderColor(
+                departmentValue,
+                errors.department_id
+              )}`}
+            >
+              <option value="">აირჩიეთ დეპარტამენტი</option>
+              {departments.map((dept) => (
+                <option key={dept.id} value={dept.id}>
+                  {dept.name}
+                </option>
+              ))}
+            </select>
+          )}
+          <p
+            className={`text-[1.2rem] mt-1 ${
+              errors.department_id
+                ? "text-red"
+                : departmentValue
+                ? "text-green"
+                : "text-lightGrey"
+            }`}
+          >
+            &#x2713; სავალდებულოა
+          </p>
+        </div>
+
         <Button
           title="დავალების შექმნა"
           bgColor="bg-blueViolet"
