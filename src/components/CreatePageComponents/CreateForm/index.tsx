@@ -12,6 +12,7 @@ interface FormData {
   responsible_employee_id: string;
   status_id: string;
   priority_id: string;
+  due_date: string;
 }
 
 function CreateForm() {
@@ -19,8 +20,15 @@ function CreateForm() {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
-  } = useForm<FormData>({ mode: "onChange" });
+    formState: { errors, isValid },
+  } = useForm<FormData>({
+    mode: "onChange",
+    defaultValues: {
+      due_date: new Date(new Date().setDate(new Date().getDate() + 1))
+        .toISOString()
+        .split("T")[0],
+    },
+  });
 
   const {
     data: departments = [],
@@ -47,7 +55,8 @@ function CreateForm() {
   const descriptionValue = watch("description", "") || "";
   const departmentValue = watch("department_id", "");
   const responsibleEmployeeValue = watch("responsible_employee_id", "");
-  // const statusValue = watch("status_id", "");
+
+  const today = new Date().toISOString().split("T")[0];
 
   const getInputBorderColor = (
     value: string,
@@ -284,12 +293,33 @@ function CreateForm() {
               </select>
             )}
           </div>
+          <div>
+            <div className="w-[55rem] mt-[5.5rem]">
+              <label className="block text-[1.4rem] text-grey font-[400]">
+                დედლაინი - თარიღი*
+              </label>
+              <input
+                type="date"
+                {...register("due_date", {
+                  required: "დედლაინი სავალდებულოა",
+                  validate: (value) =>
+                    value >= today || "წარსული თარიღი მიუღებელია",
+                })}
+                min={today}
+                className="w-full border p-2 rounded-lg"
+              />
+              {errors.due_date && (
+                <p className="text-red">{errors.due_date.message}</p>
+              )}
+            </div>
+          </div>
         </div>
         <Button
           title="დავალების შექმნა"
           bgColor="bg-blueViolet"
           textColor="text-white"
           borderColor="border-transparent"
+          disabled={!isValid}
         />
       </form>
     </section>
