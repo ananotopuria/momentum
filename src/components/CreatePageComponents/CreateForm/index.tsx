@@ -4,6 +4,8 @@ import { useDepartments } from "./../../../hooks/useDepartments";
 import { useEmployees } from "../../../hooks/useEmployees";
 import { useStatuses } from "../../../hooks/useStatuses";
 import { usePriorities } from "../../../hooks/usePriorities";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
   title: string;
@@ -16,11 +18,13 @@ interface FormData {
 }
 
 function CreateForm() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors, isValid },
+    reset,
   } = useForm<FormData>({
     mode: "onChange",
     defaultValues: {
@@ -57,7 +61,6 @@ function CreateForm() {
   const responsibleEmployeeValue = watch("responsible_employee_id", "");
 
   const today = new Date().toISOString().split("T")[0];
-
   const getInputBorderColor = (
     value: string,
     error?: FieldError | undefined
@@ -67,8 +70,42 @@ function CreateForm() {
     return "border-green";
   };
 
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    console.log("Form Data:", data);
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    if (!isValid) return; 
+    const taskData = {
+      name: data.title,
+      description: data.description,
+      due_date: new Date(data.due_date).toISOString(),
+      department_id: Number(data.department_id),
+      employee_id: Number(data.responsible_employee_id), 
+      status_id: Number(data.status_id),
+      priority_id: Number(data.priority_id),
+    };
+
+    console.log("Submitting Task:", taskData);
+
+    try {
+      const response = await axios.post(
+        "https://momentum.redberryinternship.ge/api/tasks",
+        taskData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+          },
+        }
+      );
+
+      if (response.status === 201) {
+        reset();
+        navigate("/tasks"); 
+      }
+    } catch (error) {
+      console.error("Error creating task:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.log("Response Data:", error.response.data);
+      }
+    }
   };
 
   return (
