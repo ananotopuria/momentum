@@ -11,7 +11,8 @@ export default {
         gainsboro: "#DEE2E6",
         red: "#FA4D4D",
         green: "#08A508",
-        lightGrey: "#6C757D"
+        lightGrey: "#6C757D",
+        darkGrey: "#343A40"
       },
       fontFamily: {
         firago: ["FiraGo", "sans-serif"],
