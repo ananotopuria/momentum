@@ -1,5 +1,11 @@
+import TaskDetails from "./TaskDetails";
+
 function InnerPageComponents() {
-  return <h2>InnerPageComponents</h2>;
+  return (
+    <>
+      <TaskDetails />
+    </>
+  );
 }
 
 export default InnerPageComponents;

@@ -1,5 +1,5 @@
 import { useTasks } from "../../../hooks/useTasks";
-import TaskItem from "./../Task";
+import Task from "./../Task";
 
 function TasksList() {
   const { data: tasks = [], isLoading, isError } = useTasks();
@@ -11,7 +11,7 @@ function TasksList() {
     <div className="p-8">
       <ul className="space-y-4">
         {tasks.map((task) => (
-          <TaskItem key={task.id} task={task} />
+          <Task key={task.id} task={task} />
         ))}
       </ul>
     </div>

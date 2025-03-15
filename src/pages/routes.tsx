@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "../components/Layout";
 import HomePage from "./homePage";
-import InnerPage from "./innerPage";
+import TaskDetails from "./../components/InnerPageComponents/TaskDetails"; 
 import CreatePage from "./createPage";
 import NotFoundPage from "./notFoundPage";
 
@@ -15,11 +15,11 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "/inner",
-        element: <InnerPage />,
+        path: "tasks/:id",
+        element: <TaskDetails />,
       },
       {
-        path: "/create",
+        path: "create",
         element: <CreatePage />,
       },
       {
