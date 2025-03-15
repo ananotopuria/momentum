@@ -12,7 +12,8 @@ export default {
         red: "#FA4D4D",
         green: "#08A508",
         lightGrey: "#6C757D",
-        darkGrey: "#343A40"
+        darkGrey: "#343A40",
+        lavender: "#DDD2FF"
       },
       fontFamily: {
         firago: ["FiraGo", "sans-serif"],
