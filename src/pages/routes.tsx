@@ -1,9 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import Layout from "../components/Layout";
 import HomePage from "./homePage";
-import TaskDetails from "./../components/InnerPageComponents/TaskDetails"; 
 import CreatePage from "./createPage";
 import NotFoundPage from "./notFoundPage";
+import InnerPageComponents from "../components/InnerPageComponents";
 
 const router = createBrowserRouter([
   {
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
       },
       {
         path: "tasks/:id",
-        element: <TaskDetails />,
+        element: <InnerPageComponents />,
       },
       {
         path: "create",
