@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown } from "react-icons/io";
+import { useEmployees } from "../../../hooks/useEmployees";
+import { usePriorities } from "../../../hooks/usePriorities";
+import { useDepartments } from "../../../hooks/useDepartments";
 
 interface FiltersProps {
   filters: {
@@ -21,14 +24,25 @@ function Filters({ filters, setFilters }: FiltersProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const departmentOptions = [
-    "მარკეტინგის დეპარტამენტი",
-    "დიზაინის დეპარტამენტი",
-    "ლოჯისტიკის დეპარტამენტი",
-    "IT დეპარტამენტი",
-  ];
-  const priorityOptions = ["დაბალი", "საშუალო", "მაღალი"];
-  const assigneeOptions = ["dfsfsf", "dsfdsfdsf", "dfsfsfs", "fsfsfsdxczc"];
+  const {
+    data: employees = [],
+    isLoading: isLoadingEmployees,
+    isError: isErrorEmployees,
+  } = useEmployees();
+  const {
+    data: priorities = [],
+    isLoading: isLoadingPriorities,
+    isError: isErrorPriorities,
+  } = usePriorities();
+  const {
+    data: departments = [],
+    isLoading: isLoadingDepartments,
+    isError: isErrorDepartments,
+  } = useDepartments();
+
+  useEffect(() => {
+    localStorage.setItem("taskFilters", JSON.stringify(filters));
+  }, [filters]);
 
   const handleMultiSelectChange = (
     key: "departments" | "priorities",
@@ -39,6 +53,13 @@ function Filters({ filters, setFilters }: FiltersProps) {
       [key]: prev[key].includes(value)
         ? prev[key].filter((v) => v !== value)
         : [...prev[key], value],
+    }));
+  };
+
+  const handleAssigneeChange = (value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      assignee: value,
     }));
   };
 
@@ -61,48 +82,29 @@ function Filters({ filters, setFilters }: FiltersProps) {
 
   return (
     <div
-      className="bg-white rounded border border-gainsboro p-4 relative w-[68.8rem]"
+      className="bg-white rounded border border-gray-300 p-4 relative w-[68.8rem]"
       ref={dropdownRef}
     >
       <div className="flex justify-between">
-        <h3
-          className="text-[1.6rem] font-normal cursor-pointer flex justify-between items-center"
-          onClick={() => toggleDropdown("departments")}
-        >
-          დეპარტამენტები
-          <motion.span
-            animate={{ rotate: openDropdown === "departments" ? 180 : 0 }}
-            transition={{ duration: 0.3 }}
+        {["departments", "priorities", "assignee"].map((filter) => (
+          <h3
+            key={filter}
+            className="text-[1.6rem] font-normal cursor-pointer flex justify-between items-center"
+            onClick={() => toggleDropdown(filter)}
           >
-            <IoIosArrowDown />
-          </motion.span>
-        </h3>
-
-        <h3
-          className="text-[1.6rem] font-normal cursor-pointer flex justify-between items-center"
-          onClick={() => toggleDropdown("priorities")}
-        >
-          პრიორიტეტი
-          <motion.span
-            animate={{ rotate: openDropdown === "priorities" ? 180 : 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <IoIosArrowDown />
-          </motion.span>
-        </h3>
-
-        <h3
-          className="text-[1.6rem] font-normal cursor-pointer flex justify-between items-center"
-          onClick={() => toggleDropdown("assignee")}
-        >
-          თანამშრომელი
-          <motion.span
-            animate={{ rotate: openDropdown === "assignee" ? 180 : 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <IoIosArrowDown />
-          </motion.span>
-        </h3>
+            {filter === "departments"
+              ? "დეპარტამენტები"
+              : filter === "priorities"
+              ? "პრიორიტეტი"
+              : "თანამშრომელი"}
+            <motion.span
+              animate={{ rotate: openDropdown === filter ? 180 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <IoIosArrowDown />
+            </motion.span>
+          </h3>
+        ))}
       </div>
 
       <AnimatePresence>
@@ -113,48 +115,82 @@ function Filters({ filters, setFilters }: FiltersProps) {
             exit={{ opacity: 0, y: -10 }}
             className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-300 shadow-md rounded p-4 z-10 w-full"
           >
-            {openDropdown === "departments" &&
-              departmentOptions.map((dept) => (
-                <label key={dept} className="block">
-                  <input
-                    type="checkbox"
-                    checked={filters.departments.includes(dept)}
-                    onChange={() =>
-                      handleMultiSelectChange("departments", dept)
-                    }
-                  />{" "}
-                  {dept}
-                </label>
-              ))}
-            {openDropdown === "priorities" &&
-              priorityOptions.map((priority) => (
-                <label key={priority} className="block">
-                  <input
-                    type="checkbox"
-                    checked={filters.priorities.includes(priority)}
-                    onChange={() =>
-                      handleMultiSelectChange("priorities", priority)
-                    }
-                  />{" "}
-                  {priority}
-                </label>
-              ))}
+            {openDropdown === "departments" && (
+              <div>
+                {isLoadingDepartments ? (
+                  <p>Loading departments...</p>
+                ) : isErrorDepartments ? (
+                  <p className="text-red-500">Failed to load departments</p>
+                ) : departments.length > 0 ? (
+                  departments.map((dept) => (
+                    <label key={dept.id} className="block">
+                      <input
+                        type="checkbox"
+                        checked={filters.departments.includes(dept.name)}
+                        onChange={() =>
+                          handleMultiSelectChange("departments", dept.name)
+                        }
+                      />{" "}
+                      {dept.name}
+                    </label>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No departments available</p>
+                )}
+              </div>
+            )}
+
+            {openDropdown === "priorities" && (
+              <div>
+                {isLoadingPriorities ? (
+                  <p>Loading priorities...</p>
+                ) : isErrorPriorities ? (
+                  <p className="text-red-500">Failed to load priorities</p>
+                ) : priorities.length > 0 ? (
+                  priorities.map((priority) => (
+                    <label key={priority.id} className="block">
+                      <input
+                        type="checkbox"
+                        checked={filters.priorities.includes(priority.name)}
+                        onChange={() =>
+                          handleMultiSelectChange("priorities", priority.name)
+                        }
+                      />{" "}
+                      {priority.name}
+                    </label>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No priorities available</p>
+                )}
+              </div>
+            )}
 
             {openDropdown === "assignee" && (
-              <select
-                className="border p-2 rounded w-full"
-                onChange={(e) =>
-                  setFilters((prev) => ({ ...prev, assignee: e.target.value }))
-                }
-                value={filters.assignee}
-              >
-                <option value="">აირჩიეთ</option>
-                {assigneeOptions.map((assignee) => (
-                  <option key={assignee} value={assignee}>
-                    {assignee}
-                  </option>
-                ))}
-              </select>
+              <div>
+                {isLoadingEmployees ? (
+                  <p>Loading employees...</p>
+                ) : isErrorEmployees ? (
+                  <p className="text-red-500">Failed to load employees</p>
+                ) : employees.length > 0 ? (
+                  <select
+                    className="border p-2 rounded w-full"
+                    onChange={(e) => handleAssigneeChange(e.target.value)}
+                    value={filters.assignee}
+                  >
+                    <option value="">აირჩიეთ თანამშრომელი</option>
+                    {employees.map((employee) => (
+                      <option
+                        key={employee.id}
+                        value={`${employee.name} ${employee.surname}`}
+                      >
+                        {employee.name} {employee.surname}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="text-gray-500">No employees available</p>
+                )}
+              </div>
             )}
           </motion.div>
         )}

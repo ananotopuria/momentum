@@ -12,8 +12,8 @@ function Task({ task }: TaskProps) {
       <li className="border p-8 rounded flex flex-col items-start hover:shadow-lg transition-shadow">
         <div className="w-full flex justify-between">
           <div className="flex gap-8">
-            <div>{task.priority.name}</div>
-            <div>{task.department.name}</div>
+            <div>{task.priority?.name || "No Priority"}</div>
+            <div>{task.department?.name || "No Department"}</div>
           </div>
           <div>{new Date(task.due_date).toLocaleDateString()}</div>
         </div>
@@ -26,14 +26,18 @@ function Task({ task }: TaskProps) {
           </p>
         </div>
         <div className="w-full flex justify-between mt-[2.8rem]">
-          <img
-            className="w-12 h-12 rounded-full"
-            src={task.employee.avatar}
-            alt="employee avatar"
-          />
+          {task.employee?.avatar ? (
+            <img
+              className="w-12 h-12 rounded-full"
+              src={task.employee.avatar}
+              alt="employee avatar"
+            />
+          ) : (
+            <p>სურათი არ იძებნება</p>
+          )}
           <div className="flex items-center gap-2">
             <GoComment />
-            {task.total_comments}
+            {task.total_comments ?? 0}
           </div>
         </div>
       </li>

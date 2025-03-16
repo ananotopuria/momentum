@@ -1,18 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Title from "../CommonComponents/Title";
 import Filters from "./Filter";
-import StatusBoard from "./StatusBoard";
+import StatusTasksBoard from "./StatusTaskBoard";
 
 function HomePageComponents() {
-  const [filters, setFilters] = useState<{
-    departments: string[];
-    priorities: string[];
-    assignee: string;
-  }>({
-    departments: [],
-    priorities: [],
-    assignee: "",
+  const location = useLocation(); 
+  const defaultFilters = { departments: [], priorities: [], assignee: "" };
+
+  const [filters, setFilters] = useState(() => {
+    const savedFilters = localStorage.getItem("taskFilters");
+    return savedFilters ? JSON.parse(savedFilters) : defaultFilters;
   });
+
+ 
+  useEffect(() => {
+    return () => {
+      localStorage.removeItem("taskFilters");
+    };
+  }, [location.pathname]); 
+
+ 
+  useEffect(() => {
+    localStorage.setItem("taskFilters", JSON.stringify(filters));
+  }, [filters]);
 
   return (
     <main>
@@ -20,7 +31,7 @@ function HomePageComponents() {
       <section className="px-[12rem]">
         <Filters filters={filters} setFilters={setFilters} />
       </section>
-      <StatusBoard />
+      <StatusTasksBoard filters={filters} setFilters={setFilters} />
     </main>
   );
 }
