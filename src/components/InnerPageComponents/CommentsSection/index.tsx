@@ -92,7 +92,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
           },
         }
       );
-      return response.data; 
+      return response.data;
     },
     onSuccess: (newComment) => {
       console.log("New comment received:", newComment);
@@ -128,7 +128,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
     <section className="w-[74rem] border rounded-lg bg-[#F8F3FEA6] mt-[10rem]">
       <div className="px-[4.5rem] py-[4rem] relative">
         <textarea
-          className="border p-2 w-full h-[13.5rem] rounded-lg"
+          className="border p-[2rem] w-full h-[13.5rem] rounded-lg text-[1.4rem] leading-[1] font-light pr-[17rem] focus:outline-blueViolet"
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="დაწერე კომენტარი"
@@ -136,14 +136,17 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
         <button
           onClick={() => addCommentMutation.mutate({ text: newComment.trim() })}
           disabled={!newComment.trim()}
-          className="bg-blueViolet text-white p-2 mt-2 absolute top-[13rem] right-[6rem] rounded-[2rem] px-[1.8rem] py-[.8rem]"
+          className="bg-blueViolet text-white text-[1.6rem] mt-2 absolute top-[12rem] right-[6rem] rounded-[2rem] px-[1.8rem] py-[0.8rem]"
         >
           დააკომენტარე
         </button>
-        <h4 className="mt-[6.6rem]">
-          კომენტარები ({comments ? comments.length : 0})
+        <h4 className="mt-[6.6rem] text-[2rem] leading-[1] font-medium">
+          კომენტარები{" "}
+          <span className="text-white bg-blueViolet rounded-full px-[1rem] py-[0.3rem] font-medium text-[1.4rem]">
+            {comments ? comments.length : 0}
+          </span>
         </h4>
-        <ul className="mt-4 space-y-4">
+        <ul className="mt-[4rem]">
           {nestedComments.map((comment) => (
             <CommentItem
               key={comment.id}
