@@ -13,7 +13,11 @@ export default {
         green: "#08A508",
         lightGrey: "#6C757D",
         darkGrey: "#343A40",
-        lavender: "#DDD2FF"
+        lavender: "#DDD2FF",
+        yellow: "#FFBE0B",
+        darkerGrey: "#474747",
+        lighterGrey: "#CED4DA",
+        blackish: "#0D0F10"
       },
       fontFamily: {
         firago: ["FiraGo", "sans-serif"],

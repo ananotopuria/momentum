@@ -9,7 +9,6 @@ function InnerPageComponents() {
     <main className="px-[12rem] flex justify-between">
       <TaskDetails />
       {id ? <CommentsSection taskId={id} /> : <p>No task ID found.</p>}
-      <h1>Task Details for {id}</h1>;
     </main>
   );
 }
