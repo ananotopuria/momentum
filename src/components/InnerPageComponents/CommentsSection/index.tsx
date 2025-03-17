@@ -4,16 +4,34 @@ import axios from "axios";
 import { Comment, NestedComment, CommentsSectionProps } from "../types";
 import CommentItem from "../CommentItem";
 
-const fetchAllComments = async (taskId: string): Promise<Comment[]> => {
-  const response = await axios.get(
-    `https://momentum.redberryinternship.ge/api/tasks/${taskId}/comments`,
-    {
-      headers: {
-        Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
-      },
+const flattenComments = (comments: Comment[]): Comment[] => {
+  let flat: Comment[] = [];
+  comments.forEach((comment) => {
+    const { sub_comments, ...rest } = comment;
+    flat.push(rest);
+    if (sub_comments && sub_comments.length > 0) {
+      flat = flat.concat(flattenComments(sub_comments));
     }
-  );
-  return Array.isArray(response.data) ? response.data : [];
+  });
+  return flat;
+};
+
+const fetchAllComments = async (taskId: string): Promise<Comment[]> => {
+  try {
+    const response = await axios.get(
+      `https://momentum.redberryinternship.ge/api/tasks/${taskId}/comments`,
+      {
+        headers: {
+          Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+        },
+      }
+    );
+    const data = Array.isArray(response.data) ? response.data : [];
+    return flattenComments(data);
+  } catch (error) {
+    console.error("Failed to fetch comments:", error);
+    return [];
+  }
 };
 
 const nestComments = (comments: Comment[]): NestedComment[] => {
@@ -40,10 +58,16 @@ const nestComments = (comments: Comment[]): NestedComment[] => {
 
 const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
   const queryClient = useQueryClient();
-  const { data: comments, isLoading } = useQuery<Comment[]>({
+
+  const {
+    data: comments,
+    isLoading,
+    error,
+  } = useQuery<Comment[]>({
     queryKey: ["comments", taskId],
     queryFn: () => fetchAllComments(taskId),
     enabled: !!taskId,
+    retry: 2,
   });
 
   const [newComment, setNewComment] = useState("");
@@ -58,7 +82,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
       text: string;
       parentId?: number | null;
     }) => {
-      await axios.post(
+      const response = await axios.post(
         `https://momentum.redberryinternship.ge/api/tasks/${taskId}/comments`,
         { text, parent_id: parentId || null },
         {
@@ -68,12 +92,19 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
           },
         }
       );
+      return response.data; 
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comments", taskId] });
-      setNewComment("");
+    onSuccess: (newComment) => {
+      console.log("New comment received:", newComment);
+      queryClient.setQueryData(
+        ["comments", taskId],
+        (oldData: Comment[] | undefined) => {
+          return oldData ? [...oldData, newComment] : [newComment];
+        }
+      );
       setReplyText("");
       setReplyingTo(null);
+      setNewComment("");
     },
   });
 
@@ -86,6 +117,12 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
   }, [comments]);
 
   if (isLoading) return <p>Loading comments...</p>;
+  if (error)
+    return (
+      <p className="text-red-500">
+        Failed to load comments. Please try again later.
+      </p>
+    );
 
   return (
     <section className="w-[74rem] border rounded-lg bg-[#F8F3FEA6] mt-[10rem]">

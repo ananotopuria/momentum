@@ -1,4 +1,5 @@
-import { CommentItemProps } from "./../types";
+import { CommentItemProps } from "../types";
+
 function CommentItem({
   comment,
   addReply,
@@ -52,7 +53,7 @@ function CommentItem({
           </div>
         )}
       </div>
-      {comment.sub_comments.length > 0 && (
+      {comment.sub_comments && comment.sub_comments.length > 0 && (
         <ul className="ml-4 mt-2">
           {comment.sub_comments.map((subComment) => (
             <CommentItem

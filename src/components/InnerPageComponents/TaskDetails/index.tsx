@@ -11,6 +11,7 @@ import { GoPerson } from "react-icons/go";
 import { FiCalendar } from "react-icons/fi";
 import FormattedDate from "./../../CommonComponents/FormattedDate";
 import { IoIosArrowDown } from "react-icons/io";
+import { useDepartments } from "./../../../hooks/useDepartments";
 
 const fetchTaskById = async (id: string): Promise<Task> => {
   const response = await axios.get(
@@ -40,15 +41,15 @@ function TaskDetails() {
     queryFn: () => fetchTaskById(id!),
     enabled: !!id,
   });
-
+  const { data: departments = [] } = useDepartments();
   const [selectedStatus, setSelectedStatus] = useState<number | undefined>();
-
+  
   useEffect(() => {
     if (task && selectedStatus === undefined) {
       setSelectedStatus(task.status.id);
     }
   }, [task, selectedStatus]);
-
+  
   const updateStatusMutation = useMutation({
     mutationFn: async (newStatusId: number) => {
       await axios.put(
@@ -66,10 +67,12 @@ function TaskDetails() {
       queryClient.invalidateQueries({ queryKey: ["task", id] });
     },
   });
+  const departmentColor =
+  departments.find((dept) => dept.id === task?.department?.id)?.color || "#CCCCCC";
 
   if (isLoading) return <p>Loading task details...</p>;
   if (error) return <p>Error loading task details</p>;
-
+  
   const statusOptions = statuses.map((status) => ({
     value: status.id,
     label: status.name,
@@ -100,7 +103,7 @@ function TaskDetails() {
           <div>{task?.priority?.name || "პრიორიტეტი ვერ მოიძებნა"}</div>
         </div>
 
-        <div className="text-[1.6rem] font-normal leading-[1] ">
+        <div className="text-[1.6rem] font-normal leading-[1]  px-[1.5rem] py-[0.8rem] rounded-3xl" style={{ backgroundColor: departmentColor, color: "white" }}>
           {task?.department?.name || "დავალება ვერ მოიძებნა"}
         </div>
       </div>
