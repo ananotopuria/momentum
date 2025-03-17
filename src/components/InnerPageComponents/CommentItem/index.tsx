@@ -19,13 +19,15 @@ function CommentItem({
           />
           <strong>{comment.author_nickname}</strong>: {comment.text}
         </div>
-        <button
-          onClick={() => setReplyingTo(comment.id)}
-          className="text-blue-500 mt-2"
-        >
-          უპასუხე
-        </button>
-        {replyingTo === comment.id && (
+        {comment.parent_id === null && (
+          <button
+            onClick={() => setReplyingTo(comment.id)}
+            className="text-blue-500 mt-2"
+          >
+            უპასუხე
+          </button>
+        )}
+        {replyingTo === comment.id && comment.parent_id === null && (
           <div className="flex items-start ml-4 mt-2 space-x-2">
             <img
               src={comment.author_avatar}
