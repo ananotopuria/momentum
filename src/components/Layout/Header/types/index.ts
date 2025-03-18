@@ -4,3 +4,9 @@ export interface EmployeeForm {
     avatar: File | null;
     department_id: string;
   }
+
+  export interface OptionType {
+    value: string;
+    label: string;
+  }
+  
