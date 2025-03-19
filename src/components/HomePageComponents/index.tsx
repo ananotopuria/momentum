@@ -5,7 +5,7 @@ import Filters from "./Filter";
 import StatusTasksBoard from "./StatusTaskBoard";
 
 function HomePageComponents() {
-  const location = useLocation(); 
+  const location = useLocation();
   const defaultFilters = { departments: [], priorities: [], assignee: "" };
 
   const [filters, setFilters] = useState(() => {
@@ -13,21 +13,21 @@ function HomePageComponents() {
     return savedFilters ? JSON.parse(savedFilters) : defaultFilters;
   });
 
- 
   useEffect(() => {
     return () => {
       localStorage.removeItem("taskFilters");
     };
-  }, [location.pathname]); 
+  }, [location.pathname]);
 
- 
   useEffect(() => {
     localStorage.setItem("taskFilters", JSON.stringify(filters));
   }, [filters]);
 
   return (
     <main>
-      <Title text="დავალების გვერდი" />
+      <div className="pt-[10rem]">
+        <Title text="დავალების გვერდი" />
+      </div>
       <section className="px-[12rem]">
         <Filters filters={filters} setFilters={setFilters} />
       </section>

@@ -6,7 +6,7 @@ function InnerPageComponents() {
   const { id } = useParams<{ id: string }>();
 
   return (
-    <main className="px-[12rem] flex justify-between">
+    <main className="px-[12rem] flex justify-between pt-[10rem]">
       <TaskDetails />
       {id ? <CommentsSection taskId={id} /> : <p>No task ID found.</p>}
     </main>

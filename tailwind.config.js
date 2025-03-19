@@ -17,7 +17,8 @@ export default {
         yellow: "#FFBE0B",
         darkerGrey: "#474747",
         lighterGrey: "#CED4DA",
-        blackish: "#0D0F10"
+        blackish: "#0D0F10",
+        brightLavender: "#B588F4"
       },
       fontFamily: {
         firago: ["FiraGo", "sans-serif"],

@@ -1,24 +1,8 @@
-
-
 import { useEffect } from "react";
 import { useStatuses } from "../../../hooks/useStatuses";
 import { useTasks } from "../../../hooks/useTasks";
 import Task from "../Task";
-
-interface StatusTasksBoardProps {
-  filters: {
-    departments: string[];
-    priorities: string[];
-    assignee: string;
-  };
-  setFilters: React.Dispatch<
-    React.SetStateAction<{
-      departments: string[];
-      priorities: string[];
-      assignee: string;
-    }>
-  >;
-}
+import { StatusTasksBoardProps } from "../types";
 
 const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
   filters,
@@ -77,7 +61,7 @@ const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
   });
 
   return (
-    <section className="flex flex-wrap gap-8 p-[12rem]">
+    <section className="flex flex-wrap gap-8 px-[12rem] mt-[7.9rem]">
       {statuses.length === 0 ? (
         <p className="text-center text-gray-500">No statuses found</p>
       ) : (
