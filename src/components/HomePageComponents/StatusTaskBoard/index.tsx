@@ -92,7 +92,7 @@ function StatusTasksBoard({ filters, setFilters }: StatusTasksBoardProps) {
                 <h2 className="text-[1.8rem] font-[500]">{taskStatus.name}</h2>
               </div>
               {tasksForStatus.length > 0 ? (
-                <ul className="space-y-4 mt-4">
+                <ul className="space-y-4 mt-[3rem]">
                   {tasksForStatus.map((task) => {
                     const departmentColor =
                       departments.find(

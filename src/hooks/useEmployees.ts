@@ -1,13 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-// interface Employee {
-//   id: number;
-//   name: string;
-//   surname: string;
-//   // department_id: number;
-// }
-
 interface Employee {
   id: number;
   name: string;
