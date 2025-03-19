@@ -1,5 +1,10 @@
-import { useEffect } from "react";
-import { useForm, FieldError, SubmitHandler } from "react-hook-form";
+import { useEffect, useState } from "react";
+import {
+  useForm,
+  FieldError,
+  SubmitHandler,
+  Controller,
+} from "react-hook-form";
 import Button from "../../CommonComponents/Button";
 import { useDepartments } from "./../../../hooks/useDepartments";
 import { useEmployees } from "../../../hooks/useEmployees";
@@ -7,16 +12,33 @@ import { useStatuses } from "../../../hooks/useStatuses";
 import { usePriorities } from "../../../hooks/usePriorities";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Select, { StylesConfig } from "react-select";
+import { motion } from "framer-motion";
+import { IoIosArrowDown } from "react-icons/io";
+import { OptionType, FormData } from "../types";
 
-interface FormData {
-  title: string;
-  description?: string;
-  department_id: string;
-  responsible_employee_id: string;
-  status_id: string;
-  priority_id: string;
-  due_date: string;
-}
+const customSelectStyles: StylesConfig<OptionType, false> = {
+  control: (base, state) => ({
+    ...base,
+    borderColor: state.isFocused ? "blueviolet" : "lightgrey",
+    boxShadow: "none",
+    "&:hover": { borderColor: "blueviolet" },
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: "white",
+    zIndex: 100,
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isSelected
+      ? "blueviolet"
+      : state.isFocused
+      ? "lavender"
+      : "white",
+    color: state.isSelected ? "white" : "black",
+  }),
+};
 
 function CreateForm() {
   const navigate = useNavigate();
@@ -27,6 +49,7 @@ function CreateForm() {
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     formState: { errors, isValid, touchedFields },
@@ -38,6 +61,11 @@ function CreateForm() {
       due_date: tomorrow,
     },
   });
+
+  const titleValue = watch("title", "");
+  const descriptionValue = watch("description", "") || "";
+  const departmentValue = watch("department_id", "");
+  const dueDateValue = watch("due_date", tomorrow);
 
   const {
     data: departments = [],
@@ -60,21 +88,11 @@ function CreateForm() {
     isError: isErrorPriorities,
   } = usePriorities();
 
-  const titleValue = watch("title", "");
-  const descriptionValue = watch("description", "") || "";
-  const departmentValue = watch("department_id", "");
-  const responsibleEmployeeValue = watch("responsible_employee_id", "");
-  const dueDateValue = watch("due_date", tomorrow);
-  const priorityValue = watch("priority_id", "");
-  const statusValue = watch("status_id", "");
-
   const filteredEmployees = employees.filter((emp) => {
     const deptId =
       emp.department_id !== undefined ? emp.department_id : emp.department?.id;
     return deptId?.toString() === departmentValue;
   });
-  console.log("Selected Department:", departmentValue);
-  console.log("Filtered Employees:", filteredEmployees);
 
   const getInputBorderColor = (value: string, error?: FieldError) => {
     if (value.length === 0) return "border-lightGrey";
@@ -82,13 +100,8 @@ function CreateForm() {
     return "border-green";
   };
 
-  const isRequiredValid = (value: string) => value.trim() !== "";
   const isMinLengthValid = (value: string, min: number) => value.length >= min;
   const isMaxLengthValid = (value: string, max: number) => value.length <= max;
-  const isMinWordCountValid = (value: string) => {
-    if (!value) return true;
-    return value.trim().split(/\s+/).length >= 4;
-  };
 
   useEffect(() => {
     setValue("responsible_employee_id", "");
@@ -120,9 +133,6 @@ function CreateForm() {
       status_id: Number(data.status_id),
       priority_id: Number(data.priority_id),
     };
-
-    console.log("Submitting Task:", taskData);
-
     try {
       const response = await axios.post(
         "https://momentum.redberryinternship.ge/api/tasks",
@@ -146,15 +156,37 @@ function CreateForm() {
     }
   };
 
+  const departmentOptions = departments.map((dept) => ({
+    value: dept.id.toString(),
+    label: dept.name,
+  }));
+  const employeeOptions = filteredEmployees.map((emp) => ({
+    value: emp.id.toString(),
+    label: `${emp.name} ${emp.surname}`,
+  }));
+  const priorityOptions = priorities.map((priority) => ({
+    value: priority.id.toString(),
+    label: priority.name,
+  }));
+  const statusOptions = statuses.map((status) => ({
+    value: status.id.toString(),
+    label: status.name,
+  }));
+
+  const [isOpenDept, setIsOpenDept] = useState(false);
+  const [isOpenEmployee, setIsOpenEmployee] = useState(false);
+  const [isOpenPriority, setIsOpenPriority] = useState(false);
+  const [isOpenStatus, setIsOpenStatus] = useState(false);
+
   return (
     <section className="">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="px-[5.5rem] py-[6.5rem] bg-[#FBF9FFA6] border border-[#DDD2FF] rounded-sm mx-[11.8rem]"
+        className="px-[5.5rem] py-[5.5rem] bg-[#FBF9FFA6] border border-lavender rounded-sm mx-[11.8rem]"
       >
-        <div className="flex gap-[16rem]">
-          <div className="w-[55rem]">
-            <label className="block text-[1.4rem] text-grey font-[400]">
+        <div className="flex">
+          <div className="">
+            <label className="block text-[1.6rem] text-darkGrey font-normal leading-[1]">
               სათაური*
             </label>
             <input
@@ -163,7 +195,7 @@ function CreateForm() {
                 minLength: { value: 3, message: "მინიმუმ 3 სიმბოლო" },
                 maxLength: { value: 255, message: "მაქსიმუმ 255 სიმბოლო" },
               })}
-              className={`w-full border p-2 rounded-lg ${getInputBorderColor(
+              className={`w-[55rem] h-[4.5rem] border p-[1.4rem] rounded-md mt-[1rem] ${getInputBorderColor(
                 titleValue,
                 errors.title
               )}`}
@@ -187,9 +219,8 @@ function CreateForm() {
               &#x2713; მაქსიმუმ 255 სიმბოლო
             </p>
           </div>
-
-          <div className="w-[55rem]">
-            <label className="block text-[1.4rem] text-grey font-[400]">
+          <div className="ml-[16.1rem]">
+            <label className="block text-[1.6rem] text-darkGrey font-normal leading-[1]">
               დეპარტამენტი*
             </label>
             {isLoadingDepartments ? (
@@ -197,233 +228,322 @@ function CreateForm() {
             ) : isErrorDepartments ? (
               <p className="text-red">Failed to load departments</p>
             ) : (
-              <select
-                {...register("department_id", {
-                  required: "დეპარტამენტი სავალდებულოა",
-                })}
-                className={`w-full border p-2 rounded-lg ${getInputBorderColor(
-                  departmentValue,
-                  errors.department_id
-                )}`}
-              >
-                <option value="">აირჩიეთ დეპარტამენტი</option>
-                {departments.map((dept) => (
-                  <option key={dept.id} value={dept.id}>
-                    {dept.name}
-                  </option>
-                ))}
-              </select>
+              <Controller
+                name="department_id"
+                control={control}
+                rules={{ required: "დეპარტამენტი სავალდებულოა" }}
+                render={({ field, fieldState }) => {
+                  const selectedOption =
+                    departmentOptions.find(
+                      (option) => option.value === field.value
+                    ) || null;
+                  return (
+                    <div className="relative">
+                      <Select
+                        options={departmentOptions}
+                        value={selectedOption}
+                        onChange={(selectedOption) =>
+                          field.onChange(
+                            selectedOption ? selectedOption.value : ""
+                          )
+                        }
+                        onMenuOpen={() => setIsOpenDept(true)}
+                        onMenuClose={() => setIsOpenDept(false)}
+                        isDisabled={false}
+                        placeholder="აირჩიეთ დეპარტამენტი"
+                        className="w-[55rem] rounded-md mt-[1rem] "
+                        classNamePrefix="react-select"
+                        components={{
+                          DropdownIndicator: () => null,
+                          IndicatorSeparator: () => null,
+                        }}
+                        styles={customSelectStyles}
+                      />
+                      <motion.div
+                        initial={{ rotate: 0 }}
+                        animate={{ rotate: isOpenDept ? 180 : 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="absolute top-1/3 right-5 transform -translate-y-1/2 pointer-events-none"
+                      >
+                        <IoIosArrowDown />
+                      </motion.div>
+                      {fieldState.error && (
+                        <p className="text-red text-[1.2rem] mt-1">
+                          {fieldState.error.message}
+                        </p>
+                      )}
+                    </div>
+                  );
+                }}
+              />
             )}
-            <p
-              className={`text-[1.2rem] mt-1 ${
-                !touchedFields.department_id
-                  ? "text-lightGrey"
-                  : isRequiredValid(departmentValue)
-                  ? "text-green"
-                  : "text-red"
-              }`}
-            >
-              &#x2713; სავალდებულოა
-            </p>
           </div>
         </div>
-        <div className="flex gap-[16rem]">
-          <div className="w-[55rem] mt-[5.5rem]">
-            <label className="block text-[1.4rem] text-grey font-[400]">
+        <div className="mt-[5.5rem] flex">
+          <div className="">
+            <label className="block text-[1.6rem] text-darkGrey font-normal leading-[1]">
               აღწერა
             </label>
             <textarea
               {...register("description", {
                 validate: (value) => {
-                  if (value) {
-                    if (!isMinWordCountValid(value)) {
+                  if (value && value.trim() !== "") {
+                    if (value.split(" ").length < 4) {
                       return "მინიმუმ 4 სიტყვა";
                     }
-                    if (!isMaxLengthValid(value, 255)) {
+                    if (value.length > 255) {
                       return "მაქსიმუმ 255 სიმბოლო";
                     }
                   }
                   return true;
                 },
               })}
-              className={`w-full border p-2 rounded-lg ${getInputBorderColor(
+              className={`w-[55rem] h-[13.1rem] mt-[1rem] border p-2 rounded-lg ${getInputBorderColor(
                 descriptionValue,
                 errors.description
               )}`}
+              placeholder="გთხოვთ დაწეროთ აღწერა..."
             />
             <p
               className={`text-[1.2rem] mt-1 ${
-                !touchedFields.description
-                  ? "text-lightGrey"
-                  : isMinWordCountValid(descriptionValue)
+                errors.description
+                  ? "text-red"
+                  : descriptionValue.split(" ").length >= 4
                   ? "text-green"
-                  : "text-red"
+                  : "text-lightGrey"
               }`}
             >
               &#x2713; მინიმუმ 4 სიტყვა
             </p>
             <p
               className={`text-[1.2rem] ${
-                !touchedFields.description
-                  ? "text-lightGrey"
-                  : isMaxLengthValid(descriptionValue, 255)
+                errors.description
+                  ? "text-red"
+                  : descriptionValue.length > 255
+                  ? "text-red"
+                  : descriptionValue.split(" ").length >= 4
                   ? "text-green"
-                  : "text-red"
+                  : "text-lightGrey"
               }`}
             >
               &#x2713; მაქსიმუმ 255 სიმბოლო
             </p>
           </div>
-
-          {departmentValue && (
-            <div className="w-[55rem] mt-[5.5rem]">
-              <label className="block text-[1.4rem] text-grey font-[400]">
-                პასუხისმგებელი თანამშრომელი*
+          <div>
+            {departmentValue && (
+              <div className="ml-[16.1rem]">
+                <label className="block text-[1.6rem] text-darkGrey font-normal leading-[1]">
+                  პასუხისმგებელი თანამშრომელი*
+                </label>
+                {isLoadingEmployees ? (
+                  <p className="text-grey">Loading employees...</p>
+                ) : isErrorEmployees ? (
+                  <p className="text-red">Failed to load employees</p>
+                ) : (
+                  <Controller
+                    name="responsible_employee_id"
+                    control={control}
+                    rules={{
+                      required: "პასუხისმგებელი თანამშრომელი სავალდებულოა",
+                    }}
+                    render={({ field, fieldState }) => {
+                      const selectedOption =
+                        employeeOptions.find(
+                          (option) => option.value === field.value
+                        ) || null;
+                      return (
+                        <div className="relative">
+                          <Select
+                            options={employeeOptions}
+                            value={selectedOption}
+                            onChange={(selectedOption) =>
+                              field.onChange(
+                                selectedOption ? selectedOption.value : ""
+                              )
+                            }
+                            onMenuOpen={() => setIsOpenEmployee(true)}
+                            onMenuClose={() => setIsOpenEmployee(false)}
+                            isDisabled={employeeOptions.length === 0}
+                            placeholder={
+                              employeeOptions.length === 0
+                                ? "ამ დეპარტამენტში თანამშრომელი არ იძებნება"
+                                : "აირჩიეთ თანამშრომელი"
+                            }
+                            className="w-[55rem] mt-[1rem]"
+                            classNamePrefix="react-select"
+                            components={{
+                              DropdownIndicator: () => null,
+                              IndicatorSeparator: () => null,
+                            }}
+                            styles={customSelectStyles}
+                          />
+                          <motion.div
+                            initial={{ rotate: 0 }}
+                            animate={{ rotate: isOpenEmployee ? 180 : 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none"
+                          >
+                            <IoIosArrowDown />
+                          </motion.div>
+                          {fieldState.error && (
+                            <p className="text-red text-[1.2rem] mt-1">
+                              {fieldState.error.message}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    }}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex mt-[5.5rem]">
+          <div className="flex w-[55rem] justify-between">
+            <div className="">
+              <label className="block text-[1.6rem] text-darkGrey font-normal leading-[1]">
+                პრიორიტეტი*
               </label>
-              {isLoadingEmployees ? (
-                <p className="text-grey">Loading employees...</p>
-              ) : isErrorEmployees ? (
-                <p className="text-red">Failed to load employees</p>
+              {isLoadingPriorities ? (
+                <p className="text-grey">Loading priorities...</p>
+              ) : isErrorPriorities ? (
+                <p className="text-red">Failed to load priorities</p>
               ) : (
-                <select
-                  {...register("responsible_employee_id", {
-                    required: "პასუხისმგებელი თანამშრომელი სავალდებულოა",
-                  })}
-                  className={`w-full border p-2 rounded-lg ${getInputBorderColor(
-                    responsibleEmployeeValue,
-                    errors.responsible_employee_id
-                  )}`}
-                >
-                  <option value="">აირჩიეთ თანამშრომელი</option>
-                  {filteredEmployees.length > 0 ? (
-                    filteredEmployees.map((emp) => (
-                      <option key={emp.id} value={emp.id}>
-                        {emp.name} {emp.surname}
-                      </option>
-                    ))
-                  ) : (
-                    <option value="">
-                      ამ დეპარტამენტში თანამშრომელი არ იძებნება
-                    </option>
-                  )}
-                </select>
+                <Controller
+                  name="priority_id"
+                  control={control}
+                  rules={{ required: "პრიორიტეტი სავალდებულოა" }}
+                  render={({ field, fieldState }) => {
+                    const selectedOption =
+                      priorityOptions.find(
+                        (option) => option.value === field.value
+                      ) || null;
+                    return (
+                      <div className="relative">
+                        <Select
+                          options={priorityOptions}
+                          value={selectedOption}
+                          onChange={(selectedOption) =>
+                            field.onChange(
+                              selectedOption ? selectedOption.value : ""
+                            )
+                          }
+                          onMenuOpen={() => setIsOpenPriority(true)}
+                          onMenuClose={() => setIsOpenPriority(false)}
+                          isDisabled={false}
+                          placeholder="აირჩიეთ პრიორიტეტი"
+                          className="w-[25.9rem] mt-[1rem]"
+                          classNamePrefix="react-select"
+                          components={{
+                            DropdownIndicator: () => null,
+                            IndicatorSeparator: () => null,
+                          }}
+                          styles={customSelectStyles}
+                        />
+                        <motion.div
+                          initial={{ rotate: 0 }}
+                          animate={{ rotate: isOpenPriority ? 180 : 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none"
+                        >
+                          <IoIosArrowDown />
+                        </motion.div>
+                        {fieldState.error && (
+                          <p className="text-red text-[1.2rem] mt-1">
+                            {fieldState.error.message}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  }}
+                />
               )}
-              <p
-                className={`text-[1.2rem] mt-1 ${
-                  !touchedFields.responsible_employee_id
-                    ? "text-lightGrey"
-                    : isRequiredValid(responsibleEmployeeValue)
-                    ? "text-green"
-                    : "text-red"
-                }`}
-              >
-                &#x2713; სავალდებულოა
-              </p>
             </div>
-          )}
-        </div>
-        <div className="flex gap-[16rem] mt-[5.5rem]">
-          <div className="w-[55rem]">
-            <label className="block text-[1.4rem] text-grey font-[400]">
-              პრიორიტეტი*
-            </label>
-            {isLoadingPriorities ? (
-              <p className="text-grey">Loading...</p>
-            ) : isErrorPriorities ? (
-              <p className="text-red">Failed to load</p>
-            ) : (
-              <select
-                {...register("priority_id", {
-                  required: "პრიორიტეტი სავალდებულოა",
-                })}
-                className={`w-full border p-2 rounded-lg ${getInputBorderColor(
-                  priorityValue,
-                  errors.priority_id
-                )}`}
-              >
-                <option value="">აირჩიეთ პრიორიტეტი</option>
-                {priorities.map((priority) => (
-                  <option key={priority.id} value={priority.id}>
-                    {priority.name}
-                  </option>
-                ))}
-              </select>
-            )}
-            <p
-              className={`text-[1.2rem] mt-1 ${
-                !touchedFields.priority_id
-                  ? "text-lightGrey"
-                  : isRequiredValid(priorityValue)
-                  ? "text-green"
-                  : "text-red"
-              }`}
-            >
-              &#x2713; სავალდებულოა
-            </p>
+            <div className="mb-8">
+              <label className="block text-[1.6rem] text-darkGrey font-normal leading-[1]">
+                სტატუსი*
+              </label>
+              {isLoadingStatuses ? (
+                <p className="text-grey">Loading statuses...</p>
+              ) : isErrorStatuses ? (
+                <p className="text-red">Failed to load statuses</p>
+              ) : (
+                <Controller
+                  name="status_id"
+                  control={control}
+                  rules={{ required: "სტატუსი სავალდებულოა" }}
+                  render={({ field, fieldState }) => {
+                    const selectedOption =
+                      statusOptions.find(
+                        (option) => option.value === field.value
+                      ) || null;
+                    return (
+                      <div className="relative">
+                        <Select
+                          options={statusOptions}
+                          value={selectedOption}
+                          onChange={(selectedOption) =>
+                            field.onChange(
+                              selectedOption ? selectedOption.value : ""
+                            )
+                          }
+                          onMenuOpen={() => setIsOpenStatus(true)}
+                          onMenuClose={() => setIsOpenStatus(false)}
+                          isDisabled={false}
+                          placeholder="აირჩიეთ სტატუსი"
+                          className="w-[25.9rem] mt-[1rem]"
+                          classNamePrefix="react-select"
+                          components={{
+                            DropdownIndicator: () => null,
+                            IndicatorSeparator: () => null,
+                          }}
+                          styles={customSelectStyles}
+                        />
+                        <motion.div
+                          initial={{ rotate: 0 }}
+                          animate={{ rotate: isOpenStatus ? 180 : 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none"
+                        >
+                          <IoIosArrowDown />
+                        </motion.div>
+                        {fieldState.error && (
+                          <p className="text-red text-[1.2rem] mt-1">
+                            {fieldState.error.message}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  }}
+                />
+              )}
+            </div>
           </div>
-
-          <div className="w-[55rem]">
-            <label className="block text-[1.4rem] text-grey font-[400]">
-              სტატუსი*
+          <div className="ml-[16.1rem]">
+            <label className="block text-[1.6rem] text-darkGrey font-normal leading-[1]">
+              დედლაინი - თარიღი*
             </label>
-            {isLoadingStatuses ? (
-              <p className="text-grey">Loading...</p>
-            ) : isErrorStatuses ? (
-              <p className="text-red">Failed to load</p>
-            ) : (
-              <select
-                {...register("status_id", { required: "სტატუსი სავალდებულოა" })}
-                className={`w-full border p-2 rounded-lg ${getInputBorderColor(
-                  statusValue,
-                  errors.status_id
-                )}`}
-              >
-                <option value="">აირჩიეთ სტატუსი</option>
-                {statuses.map((status) => (
-                  <option key={status.id} value={status.id}>
-                    {status.name}
-                  </option>
-                ))}
-              </select>
+            <input
+              type="date"
+              {...register("due_date", {
+                required: "დედლაინი სავალდებულოა",
+                validate: (value) =>
+                  value >= today || "წარსული თარიღი მიუღებელია",
+              })}
+              min={today}
+              className={`w-[31rem] mt-[1rem] border p-2 rounded-lg ${getInputBorderColor(
+                dueDateValue,
+                errors.due_date
+              )}`}
+            />
+            {errors.due_date && (
+              <p className="text-red text-[1.2rem] mt-1">
+                {errors.due_date.message}
+              </p>
             )}
-            <p
-              className={`text-[1.2rem] mt-1 ${
-                !touchedFields.status_id
-                  ? "text-lightGrey"
-                  : isRequiredValid(statusValue)
-                  ? "text-green"
-                  : "text-red"
-              }`}
-            >
-              &#x2713; სავალდებულოა
-            </p>
           </div>
         </div>
-
-        <div className="w-[55rem] mt-[5.5rem]">
-          <label className="block text-[1.4rem] text-grey font-[400]">
-            დედლაინი - თარიღი*
-          </label>
-          <input
-            type="date"
-            {...register("due_date", {
-              required: "დედლაინი სავალდებულოა",
-              validate: (value) =>
-                value >= today || "წარსული თარიღი მიუღებელია",
-            })}
-            min={today}
-            className={`w-full border p-2 rounded-lg ${getInputBorderColor(
-              dueDateValue,
-              errors.due_date
-            )}`}
-          />
-          {errors.due_date && (
-            <p className="text-red text-[1.2rem] mt-1">
-              {errors.due_date.message}
-            </p>
-          )}
-        </div>
-
         <div className="flex justify-end gap-[2rem] mt-[4.5rem]">
           <Button
             title="დავალების შექმნა"
