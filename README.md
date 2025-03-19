@@ -1,54 +1,117 @@
-# React + TypeScript + Vite
+# Momentum - Progress Tracking Software ⏳
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Momentum** is a **Progress Tracking** style application designed for companies like Redberry to manage employees and their assigned tasks effectively.
 
-Currently, two official plugins are available:
+## Features ✨
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The application has the following pages:
 
-## Expanding the ESLint configuration
+### 1. **Task List Page** 📋
+- Allows filtering tasks by **Department**, **Employee Name**, and **Priority**.
+- Displays tasks in **cards** with the following details:
+  - **Task Title**
+  - **Task Description** 
+  - **Priority** (Icon representation)
+  - **Due Date**
+  - **Department Name**
+  - **Employee Avatar** (Responsible Person)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 2. **Create Task Page** ➕
+- Users can create new tasks and assign them to an employee.
+- **Task fields**:
+  - **Title**: Required, Minimum 3 characters, Maximum 255 characters.
+  - **Description**: Optional, Minimum 4 words if entered, Maximum 255 characters.
+  - **Priority**: Required (High, Medium, Low), Default is Medium (Icons displayed in dropdown).
+  - **Status**: Required (New, In Progress, Ready for Testing, Completed), Default is New.
+  - **Department**: Required, dropdown that shows departments from API.
+  - **Employee**: Required, dropdown that shows employees from the selected department.
+  - **Due Date**: Required, Default is tomorrow, No past dates allowed.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 3. **Task Details Page** 🔍
+- Full details of the task, including:
+  - **Title**
+  - **Full Description**
+  - **Priority**
+  - **Employee** (Name, Avatar, Department)
+  - **Due Date**
+  - **Status** (Can be changed from here)
+  - **Comments Section**:
+    - Users can write comments.
+    - Comments will be updated in real-time, and new comments will appear at the top.
+    - There is a **Reply** option for each comment (1-level depth only).
+    - The **Submit Button** is disabled if the comment field is empty.
+    - Only one level of replies is allowed (No reply to replies).
+
+### 4. **Employee Creation Modal** 🧑‍💼
+- Allows adding a new employee with:
+  - **Name**: Required, Minimum 2 characters, Maximum 255 characters, Latin and Georgian letters only.
+  - **Surname**: Required, Minimum 2 characters, Maximum 255 characters, Latin and Georgian letters only.
+  - **Avatar**: Required, Max size 600KB, image file only.
+  - **Department**: Required (Data from API).
+  - **Validation**: Real-time validation for the input fields.
+
+---
+
+## Filtering Options 🔎
+
+- **Department Filter**: Multi-select.
+- **Priority Filter**: Multi-select.
+- **Employee Filter**: Single-select (shows Name, Surname, Avatar).
+- If multiple filters are selected, only tasks that match both criteria will be displayed.
+
+---
+
+## Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone git@github.com:ananotopuria/momentum.git
+cd momentum
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Scripts 🖥️
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+You can use the following commands to work with the project:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- `npm run dev` - Starts the development server using Vite. 🌱
+- `npm run build` - Builds the project using TypeScript and Vite. 🏗️
+- `npm run lint` - Runs ESLint to check for linting issues in the codebase. 🧹
+- `npm run preview` - Previews the built project locally. 👀
+
+## Dependencies 📦
+
+This project uses the following main dependencies:
+
+- `@tailwindcss/vite` - Vite plugin for Tailwind CSS support. 🎨
+- `@tanstack/react-query` - Powerful data fetching and caching library for React. 💡
+- `axios` - Promise-based HTTP client for the browser and Node.js. 🌍
+- `framer-motion` - Animation library for React. 🎬
+- `react` - A JavaScript library for building user interfaces. 🖥️
+- `react-dom` - React's DOM bindings. 🌐
+- `react-dropzone` - React component for drag-and-drop file uploads. 📂
+- `react-hook-form` - Library for managing form state in React. 📝
+- `react-icons` - Icon library for React. 💎
+- `react-router-dom` - Declarative routing for React. 🛣️
+- `react-select` - A flexible and customizable select input control for React. 📑
+
+## Development Dependencies 🛠️
+
+For development, the project uses:
+
+- `@eslint/js` - ESLint configuration for JavaScript. 🚨
+- `@types/react` - TypeScript type definitions for React. 🔠
+- `@types/react-dom` - TypeScript type definitions for React DOM. 🌍
+- `@types/react-router-dom` - TypeScript type definitions for React Router DOM. 🔗
+- `@vitejs/plugin-react` - Vite plugin for React. ⚙️
+- `autoprefixer` - PostCSS plugin for automatically adding vendor prefixes. 🔧
+- `eslint` - Linting tool for identifying and fixing problems in JavaScript code. 🧹
+- `eslint-plugin-react-hooks` - ESLint plugin for React Hooks rules. ⚙️
+- `eslint-plugin-react-refresh` - ESLint plugin for React Fast Refresh. 🔄
+- `globals` - Global variables for JavaScript environments. 🌍
+- `postcss` - Tool for transforming CSS with JavaScript plugins. 🎨
+- `tailwindcss` - Utility-first CSS framework for styling. 🌈
+- `typescript` - TypeScript language for adding static typing to JavaScript. 🖋️
+- `typescript-eslint` - ESLint plugin for TypeScript. 🧑‍💻
+- `vite` - Next-generation, fast development and build tool for React. ⚡
