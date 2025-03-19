@@ -47,6 +47,10 @@ function CreateForm() {
     .split("T")[0];
   const today = new Date().toISOString().split("T")[0];
 
+  const savedFormData = JSON.parse(
+    localStorage.getItem("createFormData") || "{}"
+  );
+
   const {
     register,
     control,
@@ -59,8 +63,16 @@ function CreateForm() {
     mode: "onChange",
     defaultValues: {
       due_date: tomorrow,
+      ...savedFormData,
     },
   });
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      localStorage.setItem("createFormData", JSON.stringify(value));
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const titleValue = watch("title", "");
   const descriptionValue = watch("description", "") || "";
@@ -133,6 +145,7 @@ function CreateForm() {
       status_id: Number(data.status_id),
       priority_id: Number(data.priority_id),
     };
+
     try {
       const response = await axios.post(
         "https://momentum.redberryinternship.ge/api/tasks",
@@ -144,8 +157,10 @@ function CreateForm() {
           },
         }
       );
+
       if (response.status === 201) {
         reset();
+        localStorage.removeItem("createFormData");
         navigate("/");
       }
     } catch (error) {
@@ -251,7 +266,7 @@ function CreateForm() {
                         onMenuClose={() => setIsOpenDept(false)}
                         isDisabled={false}
                         placeholder="აირჩიეთ დეპარტამენტი"
-                        className="w-[55rem] rounded-md mt-[1rem] "
+                        className="w-[55rem] rounded-md mt-[1rem]"
                         classNamePrefix="react-select"
                         components={{
                           DropdownIndicator: () => null,
