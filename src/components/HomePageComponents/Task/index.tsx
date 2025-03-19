@@ -4,16 +4,26 @@ import { GoComment } from "react-icons/go";
 
 interface TaskProps {
   task: TaskType;
+  borderColor?: string;
+  departmentColor?: string;
 }
 
-function Task({ task }: TaskProps) {
+function Task({ task, borderColor, departmentColor }: TaskProps) {
   return (
     <Link to={`/tasks/${task.id}`} className="block">
-      <li className="border p-8 rounded flex flex-col items-start hover:shadow-lg transition-shadow">
+      <li
+        className="border rounded-3xl p-8 flex flex-col items-start hover:shadow-lg transition-shadow"
+        style={{ borderColor: borderColor }}
+      >
         <div className="w-full flex justify-between">
           <div className="flex gap-8">
             <div>{task.priority?.name || "No Priority"}</div>
-            <div>{task.department?.name || "No Department"}</div>
+            <div
+              className="px-2 py-1 rounded-md text-white"
+              style={{ backgroundColor: departmentColor || "#C9A7EB" }}
+            >
+              {task.department?.name || "No Department"}
+            </div>
           </div>
           <div>{new Date(task.due_date).toLocaleDateString()}</div>
         </div>

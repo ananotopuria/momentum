@@ -1,13 +1,11 @@
 import { useEffect } from "react";
 import { useStatuses } from "../../../hooks/useStatuses";
 import { useTasks } from "../../../hooks/useTasks";
+import { useDepartments } from "../../../hooks/useDepartments";
 import Task from "../Task";
 import { StatusTasksBoardProps } from "../types";
 
-const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
-  filters,
-  setFilters,
-}) => {
+function StatusTasksBoard({ filters, setFilters }: StatusTasksBoardProps) {
   const {
     data: statuses = [],
     isLoading: isLoadingStatuses,
@@ -18,6 +16,11 @@ const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
     isLoading: isLoadingTasks,
     isError: isErrorTasks,
   } = useTasks();
+  const {
+    data: departments = [],
+    isLoading: isLoadingDepartments,
+    isError: isErrorDepartments,
+  } = useDepartments();
 
   useEffect(() => {
     const savedFilters = localStorage.getItem("taskFilters");
@@ -30,11 +33,17 @@ const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
     localStorage.setItem("taskFilters", JSON.stringify(filters));
   }, [filters]);
 
-  if (isLoadingStatuses || isLoadingTasks)
+  if (isLoadingStatuses || isLoadingTasks || isLoadingDepartments)
     return <p className="">Loading tasks...</p>;
-  if (isErrorStatuses || isErrorTasks) return <p>Failed to load tasks.</p>;
+  if (isErrorStatuses || isErrorTasks || isErrorDepartments)
+    return <p>Failed to load tasks.</p>;
 
-  const statusColors: string[] = ["#F7BC30", "#FB5607", "#FF006E", "#3A86FF"];
+  const statusColors: Record<number, string> = {
+    1: "#F7BC30",
+    2: "#FB5607",
+    3: "#FF006E",
+    4: "#3A86FF",
+  };
 
   const noFiltersApplied =
     filters.departments.length === 0 &&
@@ -63,11 +72,11 @@ const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
   });
 
   return (
-    <section className="flex flex-wrap gap-8 px-[12rem] mt-[7.9rem]">
+    <section className="flex justify-between gap-8 px-[12rem] mt-[7.9rem]">
       {statuses.length === 0 ? (
         <p className="text-center text-gray-500">No statuses found</p>
       ) : (
-        statuses.map((taskStatus, index) => {
+        statuses.map((taskStatus) => {
           const tasksForStatus = filteredTasks.filter(
             (task) => Number(task.status?.id) === Number(taskStatus.id)
           );
@@ -77,16 +86,31 @@ const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
               <div
                 className="py-3 px-6 rounded-xl text-white text-center"
                 style={{
-                  backgroundColor: statusColors[index % statusColors.length],
+                  backgroundColor: statusColors[taskStatus.id] || "#C9A7EB",
                 }}
               >
                 <h2 className="text-[1.8rem] font-[500]">{taskStatus.name}</h2>
               </div>
               {tasksForStatus.length > 0 ? (
                 <ul className="space-y-4 mt-4">
-                  {tasksForStatus.map((task) => (
-                    <Task key={task.id} task={task} />
-                  ))}
+                  {tasksForStatus.map((task) => {
+                    const departmentColor =
+                      departments.find(
+                        (dept) => dept.id === task.department?.id
+                      )?.color || "#C9A7EB";
+
+                    const borderColor =
+                      statusColors[task.status?.id] || "#D1D5DB";
+
+                    return (
+                      <Task
+                        key={task.id}
+                        task={task}
+                        borderColor={borderColor}
+                        departmentColor={departmentColor}
+                      />
+                    );
+                  })}
                 </ul>
               ) : (
                 <p className="text-gray-500 text-center mt-4">
@@ -99,6 +123,6 @@ const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
       )}
     </section>
   );
-};
+}
 
 export default StatusTasksBoard;
