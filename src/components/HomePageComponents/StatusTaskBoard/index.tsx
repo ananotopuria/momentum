@@ -30,7 +30,8 @@ const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
     localStorage.setItem("taskFilters", JSON.stringify(filters));
   }, [filters]);
 
-  if (isLoadingStatuses || isLoadingTasks) return <p>Loading tasks...</p>;
+  if (isLoadingStatuses || isLoadingTasks)
+    return <p className="">Loading tasks...</p>;
   if (isErrorStatuses || isErrorTasks) return <p>Failed to load tasks.</p>;
 
   const statusColors: string[] = ["#F7BC30", "#FB5607", "#FF006E", "#3A86FF"];
@@ -38,7 +39,7 @@ const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
   const noFiltersApplied =
     filters.departments.length === 0 &&
     filters.priorities.length === 0 &&
-    filters.assignee === "";
+    filters.assignee.length === 0;
 
   const filteredTasks = tasks.filter((task) => {
     const matchesDepartment =
@@ -49,10 +50,11 @@ const StatusTasksBoard: React.FC<StatusTasksBoardProps> = ({
       filters.priorities.length === 0 ||
       filters.priorities.includes(task.priority?.name || "");
 
+    const fullName = `${task.employee?.name || ""} ${
+      task.employee?.surname || ""
+    }`.trim();
     const matchesAssignee =
-      filters.assignee === "" ||
-      filters.assignee ===
-        `${task.employee?.name || ""} ${task.employee?.surname || ""}`;
+      filters.assignee.length === 0 || filters.assignee.includes(fullName);
 
     return (
       noFiltersApplied ||
