@@ -65,7 +65,7 @@ const formatDate = (date: string, formatType: "default" | "weekday") => {
 };
 
 const FormattedDate: React.FC<FormattedDateProps> = ({ date, formatType }) => {
-  return <span className="text-gray-900">{formatDate(date!, formatType)}</span>;
+  return <span className="text-grey font-normal leading-[1] text-[1.2rem]">{formatDate(date!, formatType)}</span>;
 };
 
 export default FormattedDate;
