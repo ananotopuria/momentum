@@ -8,6 +8,7 @@ interface ButtonProps {
   borderColor?: string;
   link?: string;
   disabled?: boolean;
+  type?: "button" | "submit" | "reset";
 }
 
 function Button({

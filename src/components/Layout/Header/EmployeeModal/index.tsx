@@ -11,7 +11,6 @@ import ImageUpload from "../imageUpload";
 import Button from "../../../CommonComponents/Button";
 import { Department } from "../../../InnerPageComponents/types";
 
-
 const customStyles: StylesConfig<OptionType, false> = {
   control: (base: CSSObjectWithLabel) => ({
     ...base,
@@ -50,18 +49,19 @@ function EmployeeModal({
     reset,
     watch,
     formState: { errors, touchedFields, isValid },
-  } = useForm<EmployeeForm>({
-    mode: "onChange", 
-  });
+  } = useForm<EmployeeForm>({ mode: "onChange" });
 
   const { data: departments = [], isLoading, isError } = useDepartments();
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const [isOpenSelect, setIsOpenSelect] = useState(false);
 
   useEffect(() => {
-    if (!isOpen) reset();
+    if (!isOpen) {
+      reset();
+    }
   }, [isOpen, reset]);
 
+  // Validation functions
   const isRequiredValid = (value: string) => value.trim() !== "";
   const isMinLengthValid = (value: string) => value.length >= 2;
   const isMaxLengthValid = (value: string) => value.length <= 255;
@@ -70,9 +70,7 @@ function EmployeeModal({
   const getValidationColor = (
     touched: boolean | undefined,
     valid: boolean
-  ) => {
-    return !touched ? "text-gray-500" : valid ? "text-green" : "text-red";
-  };
+  ) => (!touched ? "text-gray-500" : valid ? "text-green" : "text-red");
 
   const handleOutsideClick = useCallback(
     (event: MouseEvent) => {
@@ -104,12 +102,16 @@ function EmployeeModal({
       console.error("Avatar is required");
       return;
     }
-
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("surname", data.surname);
     formData.append("avatar", data.avatar);
     formData.append("department_id", data.department_id);
+
+    console.log("Submitting Employee Data:");
+    for (const pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
 
     axios
       .post("https://momentum.redberryinternship.ge/api/employees", formData, {
@@ -122,7 +124,12 @@ function EmployeeModal({
         reset();
         onClose();
       })
-      .catch((error) => console.error("Error creating employee:", error));
+      .catch((error) => {
+        console.error("Error creating employee:", error);
+        if (axios.isAxiosError(error) && error.response) {
+          console.error("Server response:", error.response.data);
+        }
+      });
   };
 
   return isOpen
@@ -310,7 +317,6 @@ function EmployeeModal({
                   </motion.div>
                 </div>
               )}
-
               <div className="flex justify-end gap-[2rem] mt-[4.5rem]">
                 <Button
                   title="გაუქმება"
@@ -320,11 +326,11 @@ function EmployeeModal({
                   onClick={onClose}
                 />
                 <Button
+                  type="submit"
                   title="დაამატე თანამშრომელი"
                   bgColor="bg-blueViolet"
                   textColor="text-white"
                   borderColor="border-transparent"
-                  onClick={handleSubmit(onSubmit)}
                   disabled={!isValid}
                 />
               </div>
