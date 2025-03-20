@@ -179,8 +179,21 @@ function CreateForm() {
 
   const employeeOptions = filteredEmployees.map((emp) => ({
     value: emp.id.toString(),
-    label: `${emp.name} ${emp.surname}`,
-  }));
+    label: (
+      <div className="flex items-center gap-2">
+        {emp.avatar && (
+          <img
+            src={emp.avatar}
+            alt={`${emp.name} ${emp.surname}`}
+            className="w-6 h-6 rounded-full"
+          />
+        )}
+        <span>
+          {emp.name} {emp.surname}
+        </span>
+      </div>
+    ),
+  })) as unknown as OptionType[];
 
   const newEmployeeOption = {
     value: "new",
