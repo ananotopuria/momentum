@@ -188,15 +188,22 @@ function CreateForm() {
   };
   const employeeOptionsWithNew = [newEmployeeOption, ...employeeOptions];
 
-  const priorityOptions = priorities.map((priority) => ({
-    value: priority.id.toString(),
-    label: priority.name,
-  }));
-
   const statusOptions = statuses.map((status) => ({
     value: status.id.toString(),
     label: status.name,
   }));
+
+  const priorityOptions = priorities.map((priority) => ({
+    value: priority.id.toString(),
+    label: (
+      <div className="flex items-center gap-2">
+        {priority.icon && (
+          <img src={priority.icon} alt={priority.name} className="w-4 h-4" />
+        )}
+        {priority.name}
+      </div>
+    ),
+  })) as unknown as OptionType[];
 
   const [isOpenDept, setIsOpenDept] = useState(false);
   const [isOpenEmployee, setIsOpenEmployee] = useState(false);

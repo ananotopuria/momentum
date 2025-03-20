@@ -1,8 +1,7 @@
-export interface OptionType {
+export type OptionType = {
   value: string;
-  label: string;
-}
-
+  label: React.ReactNode;
+};
 export interface FormData {
   title: string;
   description?: string;
