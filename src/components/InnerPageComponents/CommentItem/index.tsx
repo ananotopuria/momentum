@@ -46,7 +46,7 @@ function CommentItem({
             />
             <div className="flex-1">
               <textarea
-                className="border p-2 w-full "
+                className="border p-2 w-full"
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
                 placeholder="უპასუხეთ კომენტარს"
@@ -70,7 +70,7 @@ function CommentItem({
       </div>
       {comment.sub_comments && comment.sub_comments.length > 0 && (
         <ul className="ml-[4.5rem] mt-2">
-          {comment.sub_comments.map((subComment) => (
+          {[...comment.sub_comments].reverse().map((subComment) => (
             <CommentItem
               key={subComment.id}
               comment={subComment}

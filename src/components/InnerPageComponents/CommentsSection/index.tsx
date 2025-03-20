@@ -59,11 +59,7 @@ const nestComments = (comments: Comment[]): NestedComment[] => {
 const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
   const queryClient = useQueryClient();
 
-  const {
-    data: comments,
-    isLoading,
-    error,
-  } = useQuery<Comment[]>({
+  const { data: comments, isLoading, error } = useQuery<Comment[]>({
     queryKey: ["comments", taskId],
     queryFn: () => fetchAllComments(taskId),
     enabled: !!taskId,
@@ -113,7 +109,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
   };
 
   const nestedComments = useMemo(() => {
-    return comments ? nestComments(comments) : [];
+    return comments ? nestComments(comments).reverse() : [];
   }, [comments]);
 
   if (isLoading) return <p>Loading comments...</p>;
