@@ -26,7 +26,7 @@ function HomePageComponents() {
   return (
     <main>
       <div className="pt-[10rem]">
-        <Title text="დავალების გვერდი" />
+        <Title text="დავალებების გვერდი" />
       </div>
       <section className="px-[12rem]">
         <Filters filters={filters} setFilters={setFilters} />

@@ -143,7 +143,7 @@ function EmployeeModal({
               onClick={onClose}
               className="absolute top-[4rem] right-[5rem] rounded-full cursor-pointer"
             >
-              <IoIosCloseCircle className="w-[4rem] h-[4rem] text-[#DEE2E6]" />
+              <IoIosCloseCircle className="w-[4rem] h-[4rem] text-[#DEE2E6] hover:text-brightLavender transition-colors duration-300" />
             </button>
             <h2 className="text-[3.2rem] font-[500] text-center text-gray-700">
               თანამშრომლის დამატება

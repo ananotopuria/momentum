@@ -20,7 +20,11 @@ function Button({
   link,
   disabled = false,
 }: ButtonProps) {
-  const buttonClass = `border px-[2rem] py-[1rem] text-[1.6rem] ${bgColor} ${textColor} ${borderColor} rounded-[5px] ${
+  const hoverBg = bgColor === "bg-blueViolet" ? "hover:bg-brightLavender" : "";
+  const hoverBorder =
+    borderColor === "border-blueViolet" ? "hover:border-brightLavender" : "";
+
+  const buttonClass = `border px-[2rem] py-[1rem] text-[1.6rem] transition-colors duration-300 ${bgColor} ${textColor} ${borderColor} ${hoverBg} ${hoverBorder} rounded-[5px] ${
     disabled ? "opacity-50 cursor-not-allowed" : ""
   }`;
 

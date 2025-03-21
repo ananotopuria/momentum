@@ -59,7 +59,11 @@ const nestComments = (comments: Comment[]): NestedComment[] => {
 const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
   const queryClient = useQueryClient();
 
-  const { data: comments, isLoading, error } = useQuery<Comment[]>({
+  const {
+    data: comments,
+    isLoading,
+    error,
+  } = useQuery<Comment[]>({
     queryKey: ["comments", taskId],
     queryFn: () => fetchAllComments(taskId),
     enabled: !!taskId,
@@ -132,7 +136,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
         <button
           onClick={() => addCommentMutation.mutate({ text: newComment.trim() })}
           disabled={!newComment.trim()}
-          className="bg-blueViolet text-white text-[1.6rem] mt-2 absolute top-[12rem] right-[6rem] rounded-[2rem] px-[1.8rem] py-[0.8rem]"
+          className="bg-blueViolet hover:bg-brightLavender text-white text-[1.6rem] mt-2 absolute top-[12rem] right-[6rem] rounded-[2rem] px-[1.8rem] py-[0.8rem] cursor-pointer transition-colors duration-300 "
         >
           დააკომენტარე
         </button>

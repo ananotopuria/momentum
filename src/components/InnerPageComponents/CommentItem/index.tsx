@@ -29,7 +29,7 @@ function CommentItem({
         {comment.parent_id === null && (
           <button
             onClick={() => setReplyingTo(comment.id)}
-            className="text-blueViolet mt-[1rem] font-normal leading-[1] text-[1.2rem] flex gap-[1rem] p-[2rem] ml-[3rem]"
+            className="text-blueViolet hover:text-brightLavender mt-[1rem] font-normal leading-[1] text-[1.2rem] flex gap-[1rem] p-[2rem] ml-[3rem] transition-colors duration-300"
           >
             <span>
               <PiArrowBendUpLeftFill />
@@ -57,7 +57,7 @@ function CommentItem({
                   setReplyText("");
                 }}
                 disabled={!replyText.trim()}
-                className="text-blueViolet mt-[1rem] font-normal leading-[1] text-[1.2rem] flex gap-[1rem] p-[2rem] ml-[3rem]"
+                className="text-blueViolet hover:text-brightLavender mt-[1rem] font-normal leading-[1] text-[1.2rem] flex gap-[1rem] p-[2rem] ml-[3rem] cursor-pointer transition-colors duration-300"
               >
                 <span>
                   <PiArrowBendUpLeftFill />
