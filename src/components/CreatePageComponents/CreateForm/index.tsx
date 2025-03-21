@@ -18,6 +18,8 @@ import { IoIosArrowDown } from "react-icons/io";
 import { OptionType, FormData } from "../types";
 import EmployeeModal from "../../Layout/Header/EmployeeModal";
 
+const VITE_AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
+
 const customSelectStyles: StylesConfig<OptionType, false> = {
   control: (base, state) => ({
     ...base,
@@ -154,7 +156,7 @@ function CreateForm() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+            Authorization: `Bearer ${VITE_AUTH_TOKEN}`,
           },
         }
       );

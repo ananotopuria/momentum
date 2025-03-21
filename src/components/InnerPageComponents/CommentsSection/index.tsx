@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { Comment, NestedComment, CommentsSectionProps } from "../types";
 import CommentItem from "../CommentItem";
+const VITE_AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 const flattenComments = (comments: Comment[]): Comment[] => {
   let flat: Comment[] = [];
@@ -22,7 +23,7 @@ const fetchAllComments = async (taskId: string): Promise<Comment[]> => {
       `https://momentum.redberryinternship.ge/api/tasks/${taskId}/comments`,
       {
         headers: {
-          Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+          Authorization: `Bearer ${VITE_AUTH_TOKEN}`,
         },
       }
     );
@@ -88,7 +89,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId }) => {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+            Authorization: `Bearer ${VITE_AUTH_TOKEN}`,
           },
         }
       );

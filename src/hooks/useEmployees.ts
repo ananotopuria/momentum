@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+const VITE_AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 interface Employee {
   id: number;
@@ -16,7 +17,7 @@ interface Employee {
 const fetchEmployees = async (): Promise<Employee[]> => {
   const response = await axios.get("https://momentum.redberryinternship.ge/api/employees", {
     headers: {
-      Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+      Authorization: `Bearer ${VITE_AUTH_TOKEN}`,
     },
   });
   return response.data;

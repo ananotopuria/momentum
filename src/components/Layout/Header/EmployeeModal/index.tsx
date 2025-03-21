@@ -10,6 +10,7 @@ import { useDepartments } from "../../../../hooks/useDepartments";
 import ImageUpload from "../imageUpload";
 import Button from "../../../CommonComponents/Button";
 import { Department } from "../../../InnerPageComponents/types";
+const VITE_AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 const customStyles: StylesConfig<OptionType, false> = {
   control: (base: CSSObjectWithLabel) => ({
@@ -117,7 +118,7 @@ function EmployeeModal({
       .post("https://momentum.redberryinternship.ge/api/employees", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+          Authorization: `Bearer ${VITE_AUTH_TOKEN}`,
         },
       })
       .then(() => {

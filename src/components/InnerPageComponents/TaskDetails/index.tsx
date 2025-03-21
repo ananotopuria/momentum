@@ -12,6 +12,7 @@ import { FiCalendar } from "react-icons/fi";
 import FormattedDate from "./../../CommonComponents/FormattedDate";
 import { IoIosArrowDown } from "react-icons/io";
 import { useDepartments } from "./../../../hooks/useDepartments";
+const VITE_AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 const fetchTaskById = async (id: string): Promise<Task> => {
   const response = await axios.get(
@@ -19,7 +20,7 @@ const fetchTaskById = async (id: string): Promise<Task> => {
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+        Authorization: `Bearer ${VITE_AUTH_TOKEN}`,
       },
     }
   );
@@ -58,7 +59,7 @@ function TaskDetails() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
+            Authorization: `Bearer ${VITE_AUTH_TOKEN}`,
           },
         }
       );

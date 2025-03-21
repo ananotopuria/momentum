@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+const VITE_AUTH_TOKEN = import.meta.env.VITE_AUTH_TOKEN;
 
 export interface Task {
   id: number;
@@ -33,12 +34,16 @@ export interface Task {
 }
 
 const fetchTasks = async (): Promise<Task[]> => {
-  const response = await axios.get("https://momentum.redberryinternship.ge/api/tasks", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer 9e69afcb-2aa2-4cb2-9841-a898e8708a26`,
-    },
-  });
+  console.log(VITE_AUTH_TOKEN)
+  const response = await axios.get(
+    "https://momentum.redberryinternship.ge/api/tasks",
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${VITE_AUTH_TOKEN}`,
+      },
+    }
+  );
   return response.data;
 };
 
